@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="56" height="55" viewBox="0 0 56 55" fill="none" class="injected-svg" data-src="/images/tech-stack-images/pandas.svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img">
+<mask id="mask0_2245_7837-848" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="56" height="55">
+<path d="M55.5 0H0.5V55H55.5V0Z" fill="#D9D9D9"></path>
+</mask>
+<g mask="url(#mask0_2245_7837-848)">
+<path d="M21.3901 7.65722H26.3028V17.8578H21.3901V7.65722ZM21.3901 28.6111H26.3028V38.8118H21.3901V28.6111ZM13.5 16.0449H18.4127V49.9525H13.5V16.0449ZM29.1191 37.0274H34.0318V47.228H29.1191V37.0274ZM29.1191 16.0571H34.0318V26.2578H29.1191V16.0571ZM36.846 5H41.7587V38.9076H36.846V5Z" fill="#130754"></path>
+<path d="M26.3072 20.8359H21.3945V25.6487H26.3072V20.8359Z" fill="#FFCA00"></path>
+<path d="M34.026 29.2363H29.1133V34.049H34.026V29.2363Z" fill="#E70488"></path>
+</g>
+</svg>

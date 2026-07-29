@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="31" height="32" viewBox="0 0 31 32" fill="none" class="injected-svg" data-src="/Softimage/Mask_group_1_ba60e0413c.svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img">
+<g clip-path="url(#clip0_2750_1435-1904)">
+<mask id="mask0_2750_1435-1905" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="31" height="32">
+<path d="M31 0.5H0V31.5H31V0.5Z" fill="#D9D9D9"></path>
+</mask>
+<g mask="url(#mask0_2750_1435-1905)">
+<path d="M9.55925 14.2721L15 8.8313L20.4407 14.2721L23.6035 11.1093L15 2.50586L6.39653 11.1093L9.55925 14.2721ZM1 16.4837L4.16272 13.3211L7.32544 16.4837L4.16272 19.6465L1 16.4837ZM9.55925 18.6955L15 24.1362L20.4407 18.6955L23.6145 21.8581L15.0111 30.4727L6.40758 21.8581L9.55925 18.6955ZM22.6746 16.4837L25.8373 13.3211L29 16.4837L25.8373 19.6465L22.6746 16.4837Z" fill="#F3BA2F"></path>
+<path d="M18.2064 16.4842L14.9882 13.2773L12.6107 15.6437L12.3452 15.9202L11.7812 16.4842L14.9882 19.6911L18.2174 16.4842" fill="#F3BA2F"></path>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_2750_1435-1904">
+<rect width="31" height="31" fill="white" transform="translate(0 0.5)"></rect>
+</clipPath>
+</defs>
+</svg>

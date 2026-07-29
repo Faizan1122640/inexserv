@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="31" height="33" viewBox="0 0 31 33" fill="none" class="injected-svg" data-src="/Softimage/Mask_group_47_379d9f3909.svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img">
+<mask id="mask0_2750_976-1603" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="31" height="32">
+<path d="M31 0.849609H0V31.8496H31V0.849609Z" fill="white"></path>
+</mask>
+<g mask="url(#mask0_2750_976-1603)">
+<mask id="mask1_2750_976-1604" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="31" height="32">
+<path d="M31 0.849609H0V31.8496H31V0.849609Z" fill="#D9D9D9"></path>
+</mask>
+<g mask="url(#mask1_2750_976-1604)">
+<path d="M24.3035 20.1199V12.5496H18.5096L15.4218 9.44518V3.66797H7.85156V11.2381H13.6454L16.7499 14.3425V18.3434L13.6454 21.4479H7.85156V29.018H15.4218V23.2408L18.5263 20.1364H24.3035V20.1199ZM10.375 6.19135H12.8984V8.71477H10.375V6.19135ZM12.8984 26.4781H10.375V23.9548H12.8984V26.4781Z" fill="#FFAE1A"></path>
+</g>
+</g>
+</svg>

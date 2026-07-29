@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="56" height="55" viewBox="0 0 56 55" fill="none" class="injected-svg" data-src="/images/tech-stack-images/keras.svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img">
+<mask id="mask0_2245_7733-835" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="56" height="55">
+<path d="M55.5 0H0.5V55H55.5V0Z" fill="#D9D9D9"></path>
+</mask>
+<g mask="url(#mask0_2245_7733-835)">
+<path d="M50.4983 4.96289H5.46094V50.0002H50.4983V4.96289ZM21.3169 14.6459L21.6913 14.9611V26.6751L33.8162 14.5727H37.4966L37.8709 15.32L28.2245 24.8933L38.4944 39.788L38.113 40.3523H34.4777L25.7474 27.4435L21.6941 31.3435V39.978L21.3422 40.3523H18.6006L18.2262 39.978V14.9597L18.5415 14.6445L21.3169 14.6459Z" fill="black"></path>
+</g>
+</svg>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="56" height="55" viewBox="0 0 56 55" fill="none" class="injected-svg" data-src="/images/tech-stack-images/pytorch.svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img">
+<g clip-path="url(#clip0_2245_7734-836)">
+<mask id="mask0_2245_7734-837" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="56" height="55">
+<path d="M55.5 0H0.5V55H55.5V0Z" fill="#D9D9D9"></path>
+</mask>
+<g mask="url(#mask0_2245_7734-837)">
+<path d="M41.2122 18.0908C48.5187 25.3973 48.5187 37.1182 41.2122 44.4754C34.058 51.7819 22.2864 51.7819 14.9799 44.4754C7.67337 37.1689 7.67337 25.3973 14.9799 18.0908L28.0707 5V11.5454L26.8529 12.7632L18.1765 21.4396C12.6966 26.818 12.6966 35.6467 18.1765 41.1266C23.5549 46.6065 32.3836 46.6065 37.8634 41.1266C43.3433 35.7482 43.3433 26.9195 37.8634 21.4396L41.2122 18.0908ZM34.6668 17.279C33.3217 17.279 32.2313 16.1886 32.2313 14.8435C32.2313 13.4984 33.3217 12.408 34.6668 12.408C36.0119 12.408 37.1023 13.4984 37.1023 14.8435C37.1023 16.1886 36.0119 17.279 34.6668 17.279Z" fill="#EE4C2C"></path>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_2245_7734-836">
+<rect width="55" height="55" fill="white" transform="translate(0.5)"></rect>
+</clipPath>
+</defs>
+</svg>

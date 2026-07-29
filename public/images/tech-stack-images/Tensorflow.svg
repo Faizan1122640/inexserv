@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="56" height="55" viewBox="0 0 56 55" fill="none" class="injected-svg" data-src="/images/tech-stack-images/tensorflow.svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img">
+<mask id="mask0_2245_7727-834" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="56" height="55">
+<path d="M55.5 0H0.5V55H55.5V0Z" fill="#D9D9D9"></path>
+</mask>
+<g mask="url(#mask0_2245_7727-834)">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M28.7235 9.00008L44.5058 18.2083L44.5274 26.5616L35.028 20.9561V25.1746L39.7635 27.938L39.7899 35.2013L35.028 32.3872V43.0067L28.7235 46.7456V9.00008ZM27.3039 9V46.7455L20.9994 43.0066V20.9563L11.5 26.5616L11.5215 18.2082L27.3039 9Z" fill="#4285F4"></path>
+</g>
+</svg>
