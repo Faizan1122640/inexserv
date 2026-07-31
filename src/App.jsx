@@ -21,7 +21,7 @@ function MainWebsite() {
   return (
     <div className="min-h-screen bg-white text-[#0f2b48] font-sans antialiased overflow-x-hidden">
       <Preloader />
-      <Header />
+      <Header data={data.header} />
       <main>
         <Hero data={data.hero} />
         <ServicesSection data={data.servicesSection} />
