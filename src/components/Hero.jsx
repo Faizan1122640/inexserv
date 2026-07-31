@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import siteData from '../data/data.json';
+import fallbackData from '../data/data.json';
 
-export default function Hero({ onOpenContact }) {
-  const { hero } = siteData;
+export default function Hero({ data, onOpenContact }) {
+  const hero = data || fallbackData.hero;
   const [kwIdx, setKwIdx] = useState(0);
   const [kwVisible, setKwVisible] = useState(true);
 
-  // Duplicate 3× so the CSS marquee can loop seamlessly
-  const marqueeLogos = [...hero.partnerLogos, ...hero.partnerLogos, ...hero.partnerLogos];
+  const partnerLogos = hero.partnerLogos || fallbackData.hero.partnerLogos;
+  const marqueeLogos = [...partnerLogos, ...partnerLogos, ...partnerLogos];
 
-  // Rotate keyword with a fade transition
   useEffect(() => {
+    if (!hero.keywords || hero.keywords.length === 0) return;
     const id = setInterval(() => {
       setKwVisible(false);
       setTimeout(() => {
@@ -19,7 +19,7 @@ export default function Hero({ onOpenContact }) {
       }, 300);
     }, 2800);
     return () => clearInterval(id);
-  }, [hero.keywords.length]);
+  }, [hero.keywords]);
 
   return (
     <div className="max-w-[1800px] relative mx-auto w-full overflow-hidden" style={{ opacity: 1 }}>
@@ -65,7 +65,7 @@ export default function Hero({ onOpenContact }) {
                 }}
               >
                 <span className="text-gradient inline-block whitespace-nowrap">
-                  {hero.keywords[kwIdx]}
+                  {hero.keywords?.[kwIdx] || 'AI'}
                 </span>
               </span>
             </div>
@@ -82,12 +82,12 @@ export default function Hero({ onOpenContact }) {
               className="cursor-pointer flex items-center justify-center bg-sky-primary text-base md:text-lg py-3 md:py-3.5 px-6 md:px-8 text-white rounded-lg hover:rounded-full transition-all duration-300 font-medium shadow min-w-[150px]"
               type="button"
             >
-              {hero.ctaLetstalk}
+              {hero.ctaLetstalk || "Let's Talk"}
             </button>
 
             <button className="flex gap-2.5 hover:cursor-pointer items-center group">
               <p className="text-sky-primary text-base md:text-lg font-medium group-hover:text-sky-primary transition-colors duration-200">
-                {hero.ctaLearnMore}
+                {hero.ctaLearnMore || 'Learn More'}
               </p>
               <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 20 20"
                 aria-hidden="true"
