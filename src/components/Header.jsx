@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import siteData from '../data/data.json';
+import fallbackData from '../data/data.json';
 
-export default function Header({ onOpenContact }) {
+export default function Header({ data, onOpenContact }) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const { header } = siteData;
+  const header = data || fallbackData.header;
 
   // Bind Services mega dropdown using JS hover
   useEffect(() => {

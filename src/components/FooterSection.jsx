@@ -1,8 +1,9 @@
 import React from 'react';
-import siteData from '../data/data.json';
+import fallbackData from '../data/data.json';
 
-export default function FooterSection() {
-  const { footer, officeLocations } = siteData;
+export default function FooterSection({ data, officeLocations: locationsProp }) {
+  const footer = data || fallbackData.footer;
+  const officeLocations = locationsProp || fallbackData.officeLocations;
 
   return (
     <footer className="w-full text-white bg-[#074476] overflow-hidden">
@@ -70,7 +71,7 @@ export default function FooterSection() {
                 type="button"
                 className="rizzui-button font-medium active:enabled:translate-y-px focus:outline-none focus-visible:ring-[1.8px] focus-visible:ring-offset-2 ring-offset-background transition-colors duration-200 text-sm h-10 dark:backdrop-blur hover:bg-primary-dark dark:hover:bg-primary/90 focus-visible:ring-muted group cursor-pointer bg-gray-100/10 border flex gap-3 items-center border-gray-200/30 text-white hover:rounded-full px-8 py-3 rounded-lg justify-between"
               >
-                <span>{footer.letsTalkButtonText}</span>
+                <span>{footer.letsTalkButtonText || "Let's Talk"}</span>
                 <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 448 512" className="w-4 h-4 text-white duration-300" xmlns="http://www.w3.org/2000/svg">
                   <path d="M190.5 66.9l22.2-22.2c9.4-9.4 24.6-9.4 33.9 0L441 239c9.4 9.4 9.4 24.6 0 33.9L246.6 467.3c-9.4 9.4-24.6 9.4-33.9 0l-22.2-22.2c-9.5-9.5-9.3-25 .4-34.3L311.4 296H24c-13.3 0-24-10.7-24-24v-32c0-13.3 10.7-24 24-24h287.4L190.9 101.2c-9.8-9.3-10-24.8-.4-34.3z"></path>
                 </svg>
@@ -124,7 +125,7 @@ export default function FooterSection() {
                 </div>
                 <div className="sm:ml-3">
                   <p className="text-white font-semibold text-sm lg:text-lg">Email:</p>
-                  <p className="text-gray-300 font-normal text-xs lg:text-sm whitespace-pre-line">{footer.contactInfo.emails.join('\n')}</p>
+                  <p className="text-gray-300 font-normal text-xs lg:text-sm whitespace-pre-line">{footer.contactInfo.emails ? footer.contactInfo.emails.join('\n') : ''}</p>
                 </div>
               </div>
 

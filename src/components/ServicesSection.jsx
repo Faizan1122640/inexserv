@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import siteData from '../data/data.json';
+import fallbackData from '../data/data.json';
 
 function useInView(options = { threshold: 0.15 }) {
   const ref = useRef(null);
@@ -24,8 +24,8 @@ function useInView(options = { threshold: 0.15 }) {
   return [ref, isInView];
 }
 
-export default function ServicesSection() {
-  const { servicesSection } = siteData;
+export default function ServicesSection({ data }) {
+  const servicesSection = data || fallbackData.servicesSection;
   const [headerRef, headerInView] = useInView({ threshold: 0.2 });
   const [gridRef, gridInView] = useInView({ threshold: 0.1 });
 
