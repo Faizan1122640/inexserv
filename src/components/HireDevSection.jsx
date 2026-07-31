@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import siteData from '../data/data.json';
+import fallbackData from '../data/data.json';
 
-export default function HireDevSection() {
-  const { hireDevSection } = siteData;
-  const hireCategories = hireDevSection.hireCategories;
-  const [activeTab, setActiveTab] = useState(hireCategories[0].id);
+export default function HireDevSection({ data }) {
+  const hireDevSection = data || fallbackData.hireDevSection;
+  const hireCategories = hireDevSection.hireCategories || fallbackData.hireDevSection.hireCategories;
+  const [activeTab, setActiveTab] = useState(hireCategories[0]?.id || 'frontend');
   const [searchQuery, setSearchQuery] = useState('');
 
   const currentCategory = hireCategories.find(c => c.id === activeTab) || hireCategories[0];
-  const filteredTechs = currentCategory.techs.filter(t =>
+  const filteredTechs = currentCategory ? currentCategory.techs.filter(t =>
     t.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  ) : [];
 
   return (
     <div className="md:my-16 my-4 w-full">

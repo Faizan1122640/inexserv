@@ -1,8 +1,8 @@
 import React from 'react';
-import siteData from '../data/data.json';
+import fallbackData from '../data/data.json';
 
-export default function CtaBannerSection() {
-  const { ctaBanner } = siteData;
+export default function CtaBannerSection({ data }) {
+  const ctaBanner = data || fallbackData.ctaBanner;
 
   return (
     <div className="md:my-16 my-4 w-full">
