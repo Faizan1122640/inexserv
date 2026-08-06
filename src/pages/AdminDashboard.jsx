@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { logout } from '../redux/authSlice';
 import { useSiteData } from '../hooks/useSiteData';
 import { supabase } from '../lib/supabaseClient';
 import defaultData from '../data/data.json';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { data, loading, isUsingSupabase, updateSiteData } = useSiteData();
   const [activeTab, setActiveTab] = useState('hero');
   const [formData, setFormData] = useState(null);
@@ -37,7 +40,7 @@ export default function AdminDashboard() {
     if (supabase) {
       await supabase.auth.signOut();
     }
-    localStorage.removeItem('ies_admin_auth');
+    dispatch(logout());
     navigate('/admin/login');
   };
 

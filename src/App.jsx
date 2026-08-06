@@ -11,6 +11,7 @@ import HireDevSection from './components/HireDevSection';
 import FooterSection from './components/FooterSection';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
+import ProtectedRoute from './components/ProtectedRoute';
 import { useSiteData } from './hooks/useSiteData';
 
 function MainWebsite() {
@@ -41,7 +42,14 @@ export default function App() {
       <Routes>
         <Route path="/" element={<MainWebsite />} />
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );

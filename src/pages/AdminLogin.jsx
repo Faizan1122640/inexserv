@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from '../redux/authSlice';
 import { supabase } from '../lib/supabaseClient';
 
 export default function AdminLogin() {
@@ -8,6 +10,7 @@ export default function AdminLogin() {
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -17,7 +20,10 @@ export default function AdminLogin() {
     if (!supabase) {
       // Local demo mode fallback login
       if (email === 'admin@inexserv.com' && password === 'admin123') {
-        localStorage.setItem('ies_admin_auth', 'true');
+        dispatch(loginSuccess({
+          token: 'demo-admin-token-12345',
+          user: { email: 'admin@inexserv.com', role: 'admin' }
+        }));
         navigate('/admin/dashboard');
         return;
       }
@@ -35,7 +41,10 @@ export default function AdminLogin() {
       if (error) {
         setErrorMsg(error.message);
       } else if (data.session) {
-        localStorage.setItem('ies_admin_auth', 'true');
+        dispatch(loginSuccess({
+          token: data.session.access_token,
+          user: data.user
+        }));
         navigate('/admin/dashboard');
       }
     } catch (err) {
