@@ -1,33 +1,25 @@
 import { useState, useEffect } from 'react';
 import defaultData from '../data/data.json';
-import { supabase } from '../lib/supabaseClient';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export function useSiteData() {
   const [data, setData] = useState(defaultData);
   const [loading, setLoading] = useState(true);
-  const [isUsingSupabase, setIsUsingSupabase] = useState(false);
+  const [isUsingBackend, setIsUsingBackend] = useState(false);
 
   const fetchContent = async () => {
-    if (!supabase) {
-      setLoading(false);
-      return;
-    }
-
     try {
-      const { data: dbRow, error } = await supabase
-        .from('site_content')
-        .select('data')
-        .eq('id', 'main')
-        .single();
-
-      if (error) {
-        console.warn('Supabase fetch notice: using fallback data.json', error.message);
-      } else if (dbRow && dbRow.data) {
-        setData(dbRow.data);
-        setIsUsingSupabase(true);
+      const res = await fetch(`${API_BASE_URL}/api/content`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          setData(json.data);
+          setIsUsingBackend(true);
+        }
       }
     } catch (err) {
-      console.warn('Supabase error:', err);
+      console.warn('Backend API notice: using fallback data.json', err.message);
     } finally {
       setLoading(false);
     }
@@ -39,14 +31,30 @@ export function useSiteData() {
 
   const updateSiteData = async (newData) => {
     setData(newData);
-    if (supabase) {
-      const { error } = await supabase
-        .from('site_content')
-        .upsert({ id: 'main', data: newData, updated_at: new Date().toISOString() });
-      if (error) throw error;
-      setIsUsingSupabase(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/content`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newData)
+      });
+      if (!res.ok) {
+        const errJson = await res.json();
+        throw new Error(errJson.error || 'Failed to update content');
+      }
+      setIsUsingBackend(true);
+    } catch (err) {
+      console.error('Failed to update content via backend:', err);
+      throw err;
     }
   };
 
-  return { data, setData, loading, isUsingSupabase, updateSiteData, refresh: fetchContent };
+  return {
+    data,
+    setData,
+    loading,
+    isUsingSupabase: isUsingBackend,
+    isUsingBackend,
+    updateSiteData,
+    refresh: fetchContent
+  };
 }

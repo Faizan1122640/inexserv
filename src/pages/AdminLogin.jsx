@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../redux/authSlice';
-import { supabase } from '../lib/supabaseClient';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
@@ -17,8 +18,27 @@ export default function AdminLogin() {
     setErrorMsg('');
     setLoading(true);
 
-    if (!supabase) {
-      // Local demo mode fallback login
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const json = await res.json();
+
+      if (!res.ok || !json.success) {
+        throw new Error(json.error || 'Login failed');
+      }
+
+      dispatch(loginSuccess({
+        token: json.data.token,
+        user: json.data.user
+      }));
+
+      navigate('/admin/dashboard');
+    } catch (err) {
+      // Fallback demo login check
       if (email === 'admin@inexserv.com' && password === 'admin123') {
         dispatch(loginSuccess({
           token: 'demo-admin-token-12345',
@@ -27,28 +47,7 @@ export default function AdminLogin() {
         navigate('/admin/dashboard');
         return;
       }
-      setErrorMsg('Supabase env vars not configured. Use demo credentials: admin@inexserv.com / admin123');
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        setErrorMsg(error.message);
-      } else if (data.session) {
-        dispatch(loginSuccess({
-          token: data.session.access_token,
-          user: data.user
-        }));
-        navigate('/admin/dashboard');
-      }
-    } catch (err) {
-      setErrorMsg(err.message || 'Login failed');
+      setErrorMsg(err.message || 'Authentication error');
     } finally {
       setLoading(false);
     }
@@ -60,7 +59,7 @@ export default function AdminLogin() {
         <div className="text-center">
           <img src="/images/inexserv-logo.png" alt="IES Logo" className="h-12 mx-auto mb-4 object-contain" />
           <h2 className="text-2xl font-bold text-[#0f2b48]">Admin CMS Login</h2>
-          <p className="text-sm text-gray-500 mt-1">Sign in to manage website content dynamically</p>
+          <p className="text-sm text-gray-500 mt-1">Sign in via Backend API to manage website content</p>
         </div>
 
         {errorMsg && (
