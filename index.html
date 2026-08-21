@@ -1,16 +1,68 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" style="background-color: #074476; margin: 0; padding: 0;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>inexserv</title>
-    <meta name="description" content="Integrated Excellence Service — Navbar and Hero section components." />
+    <title>Inexserv - Integrated Excellence Service</title>
+    <meta name="description" content="Integrated Excellence Service — Software Development Services." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+      html, body {
+        background-color: #074476 !important;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #html-preloader {
+        position: fixed;
+        inset: 0;
+        z-index: 999999;
+        background-color: #074476;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      @keyframes inexservSpin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      .spin-arc-path {
+        animation: inexservSpin 1.1s linear infinite;
+        transform-origin: 90px 90px;
+      }
+    </style>
   </head>
-  <body>
-    <div id="root"></div>
+  <body style="background-color: #074476; margin: 0; padding: 0;">
+    <div id="root">
+      <div id="html-preloader">
+        <svg viewBox="0 0 180 180" style="width: 180px; height: 180px;" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="iesGradHtml" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00E676" />
+              <stop offset="35%" stop-color="#04A552" />
+              <stop offset="65%" stop-color="#00b0ff" />
+              <stop offset="100%" stop-color="#0040dd" />
+            </linearGradient>
+          </defs>
+          <circle cx="90" cy="90" r="35" stroke="rgba(0, 180, 180, 0.18)" stroke-width="1.5" />
+          <circle cx="90" cy="90" r="35" stroke="#04A552" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="65 249" class="spin-arc-path" />
+          <g fill="url(#iesGradHtml)" transform="translate(90, 90) scale(0.38) translate(-50, -50)">
+            <rect x="14" y="47.5" width="4.5" height="5" rx="2.25" />
+            <rect x="22" y="40" width="4.5" height="20" rx="2.25" />
+            <rect x="30" y="32.5" width="4.5" height="35" rx="2.25" />
+            <rect x="38" y="25" width="4.5" height="50" rx="2.25" />
+            <rect x="46" y="17.5" width="4.5" height="65" rx="2.25" />
+            <rect x="54" y="25" width="4.5" height="50" rx="2.25" />
+            <rect x="62" y="32.5" width="4.5" height="35" rx="2.25" />
+            <rect x="70" y="40" width="4.5" height="20" rx="2.25" />
+            <rect x="78" y="47.5" width="4.5" height="5" rx="2.25" />
+          </g>
+        </svg>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
