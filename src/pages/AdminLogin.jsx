@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../redux/authSlice';
+import { supabase } from '../lib/supabaseClient';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -18,6 +19,7 @@ export default function AdminLogin() {
     setErrorMsg('');
     setLoading(true);
 
+    // 1. Try Backend Express API if available
     try {
       const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
@@ -25,32 +27,60 @@ export default function AdminLogin() {
         body: JSON.stringify({ email, password })
       });
 
-      const json = await res.json();
-
-      if (!res.ok || !json.success) {
-        throw new Error(json.error || 'Login failed');
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          dispatch(loginSuccess({
+            token: json.data.token,
+            user: json.data.user
+          }));
+          navigate('/admin/dashboard');
+          return;
+        }
       }
-
-      dispatch(loginSuccess({
-        token: json.data.token,
-        user: json.data.user
-      }));
-
-      navigate('/admin/dashboard');
-    } catch (err) {
-      // Fallback demo login check
-      if (email === 'admin@inexserv.com' && password === 'admin123') {
-        dispatch(loginSuccess({
-          token: 'demo-admin-token-12345',
-          user: { email: 'admin@inexserv.com', role: 'admin' }
-        }));
-        navigate('/admin/dashboard');
-        return;
-      }
-      setErrorMsg(err.message || 'Authentication error');
-    } finally {
-      setLoading(false);
+    } catch (apiErr) {
+      console.warn('Backend API login unavailable, attempting Direct Supabase Auth...', apiErr.message);
     }
+
+    // 2. Fallback to Direct Supabase Auth
+    if (supabase) {
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) {
+          setErrorMsg(error.message);
+        } else if (data && data.session) {
+          dispatch(loginSuccess({
+            token: data.session.access_token,
+            user: data.user
+          }));
+          navigate('/admin/dashboard');
+          return;
+        }
+      } catch (sbErr) {
+        setErrorMsg(sbErr.message || 'Supabase authentication failed');
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // 3. Fallback to Demo Credentials if no Supabase and no Express API
+    if ((email === 'admin@gmail.com' || email === 'admin@inexserv.com') && (password === 'admin123' || password === 'admin@123')) {
+      dispatch(loginSuccess({
+        token: 'demo-admin-token-12345',
+        user: { email, role: 'admin' }
+      }));
+      navigate('/admin/dashboard');
+      setLoading(false);
+      return;
+    }
+
+    setErrorMsg('Invalid email or password. Please check your credentials.');
+    setLoading(false);
   };
 
   return (
@@ -59,7 +89,7 @@ export default function AdminLogin() {
         <div className="text-center">
           <img src="/images/inexserv-logo.png" alt="IES Logo" className="h-12 mx-auto mb-4 object-contain" />
           <h2 className="text-2xl font-bold text-[#0f2b48]">Admin CMS Login</h2>
-          <p className="text-sm text-gray-500 mt-1">Sign in via Backend API to manage website content</p>
+          <p className="text-sm text-gray-500 mt-1">Sign in to manage website content dynamically</p>
         </div>
 
         {errorMsg && (
@@ -76,7 +106,7 @@ export default function AdminLogin() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@inexserv.com"
+              placeholder="admin@gmail.com"
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-800 focus:outline-none focus:border-[#04A552] focus:ring-1 focus:ring-[#04A552]"
             />
           </div>

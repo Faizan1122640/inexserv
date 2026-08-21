@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import defaultData from '../data/data.json';
+import { supabase } from '../lib/supabaseClient';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -9,10 +10,10 @@ export function useSiteData() {
   const [isUsingBackend, setIsUsingBackend] = useState(false);
 
   const fetchContent = async () => {
+    // 1. Try Express Backend API
     try {
-      // 1.2s fast timeout to prevent network hanging if server is offline
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 1200);
+      const timeoutId = setTimeout(() => controller.abort(), 1000);
 
       const res = await fetch(`${API_BASE_URL}/api/content`, {
         signal: controller.signal
@@ -25,13 +26,33 @@ export function useSiteData() {
         if (json.success && json.data) {
           setData(json.data);
           setIsUsingBackend(true);
+          setLoading(false);
+          return;
         }
       }
     } catch (err) {
-      console.warn('Fast Notice: using local data.json fallback', err.name === 'AbortError' ? 'Request Timeout' : err.message);
-    } finally {
-      setLoading(false);
+      console.warn('Backend API unavailable, attempting Direct Supabase DB query...', err.message);
     }
+
+    // 2. Fallback to Direct Supabase DB fetch
+    if (supabase) {
+      try {
+        const { data: dbRow, error } = await supabase
+          .from('site_content')
+          .select('data')
+          .eq('id', 'main')
+          .single();
+
+        if (!error && dbRow && dbRow.data) {
+          setData(dbRow.data);
+          setIsUsingBackend(true);
+        }
+      } catch (sbErr) {
+        console.warn('Supabase DB fetch notice: using data.json fallback', sbErr.message);
+      }
+    }
+
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -40,20 +61,30 @@ export function useSiteData() {
 
   const updateSiteData = async (newData) => {
     setData(newData);
+    let success = false;
+
+    // 1. Try Express Backend API
     try {
       const res = await fetch(`${API_BASE_URL}/api/content`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newData)
       });
-      if (!res.ok) {
-        const errJson = await res.json();
-        throw new Error(errJson.error || 'Failed to update content');
+      if (res.ok) {
+        setIsUsingBackend(true);
+        success = true;
       }
-      setIsUsingBackend(true);
     } catch (err) {
-      console.error('Failed to update content via backend:', err);
-      throw err;
+      console.warn('Backend API update failed, attempting Supabase direct update...', err.message);
+    }
+
+    // 2. Fallback to Direct Supabase DB update
+    if (!success && supabase) {
+      const { error } = await supabase
+        .from('site_content')
+        .upsert({ id: 'main', data: newData, updated_at: new Date().toISOString() });
+      if (error) throw error;
+      setIsUsingBackend(true);
     }
   };
 
