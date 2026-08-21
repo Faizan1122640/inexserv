@@ -15,23 +15,26 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { useSiteData } from './hooks/useSiteData';
 
 function MainWebsite() {
-  const { data, loading } = useSiteData();
-
-  if (loading) return null;
+  const { data } = useSiteData();
 
   return (
     <div className="min-h-screen bg-white text-[#0f2b48] font-sans antialiased overflow-x-hidden">
+      {/* Preloader renders IMMEDIATELY at 0ms so user NEVER sees a white screen */}
       <Preloader />
-      <Header data={data.header} />
-      <main>
-        <Hero data={data.hero} />
-        <ServicesSection data={data.servicesSection} />
-        <SolutionsSection data={data.solutionsSection} />
-        <TechStackSection data={data.techStackSection} />
-        <CtaBannerSection data={data.ctaBanner} />
-        <HireDevSection data={data.hireDevSection} />
-      </main>
-      <FooterSection data={data.footer} officeLocations={data.officeLocations} />
+      {data && (
+        <>
+          <Header data={data.header} />
+          <main>
+            <Hero data={data.hero} />
+            <ServicesSection data={data.servicesSection} />
+            <SolutionsSection data={data.solutionsSection} />
+            <TechStackSection data={data.techStackSection} />
+            <CtaBannerSection data={data.ctaBanner} />
+            <HireDevSection data={data.hireDevSection} />
+          </main>
+          <FooterSection data={data.footer} officeLocations={data.officeLocations} />
+        </>
+      )}
     </div>
   );
 }
