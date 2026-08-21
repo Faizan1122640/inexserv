@@ -5,13 +5,13 @@ export default function Preloader() {
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
-    // 1.2s display duration, 700ms smooth fade out
+    // Fast 500ms display, 300ms smooth fade out
     const timer = setTimeout(() => {
       setFadeOut(true);
       setTimeout(() => {
         setLoading(false);
-      }, 700);
-    }, 1200);
+      }, 300);
+    }, 500);
 
     return () => clearTimeout(timer);
   }, []);
@@ -20,7 +20,7 @@ export default function Preloader() {
 
   return (
     <div
-      className={`fixed inset-0 z-[99999] bg-[#074476] flex items-center justify-center transition-opacity duration-700 ${
+      className={`fixed inset-0 z-[99999] bg-[#074476] flex items-center justify-center transition-opacity duration-300 ${
         fadeOut ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
     >
@@ -47,9 +47,6 @@ export default function Preloader() {
             }
           `}</style>
         </defs>
-
-        {/* 1. Outer large faint static ring */}
-        {/* <circle cx="90" cy="90" r="78" stroke="rgba(255, 255, 255, 0.08)" strokeWidth="1" /> */}
 
         {/* 2. Middle static track ring */}
         <circle cx="90" cy="90" r="35" stroke="rgba(0, 180, 180, 0.18)" strokeWidth="1.5" />

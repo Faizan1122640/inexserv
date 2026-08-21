@@ -10,7 +10,16 @@ export function useSiteData() {
 
   const fetchContent = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/content`);
+      // 1.2s fast timeout to prevent network hanging if server is offline
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 1200);
+
+      const res = await fetch(`${API_BASE_URL}/api/content`, {
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
       if (res.ok) {
         const json = await res.json();
         if (json.success && json.data) {
@@ -19,7 +28,7 @@ export function useSiteData() {
         }
       }
     } catch (err) {
-      console.warn('Backend API notice: using fallback data.json', err.message);
+      console.warn('Fast Notice: using local data.json fallback', err.name === 'AbortError' ? 'Request Timeout' : err.message);
     } finally {
       setLoading(false);
     }
