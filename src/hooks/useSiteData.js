@@ -22,7 +22,11 @@ export function useSiteData() {
       if (res.ok) {
         const json = await res.json();
         if (json.success && json.data) {
-          setData(json.data);
+          const merged = {
+            ...defaultData,
+            ...json.data
+          };
+          setData(merged);
           setIsUsingBackend(true);
         }
       }

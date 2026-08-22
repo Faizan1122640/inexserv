@@ -4,7 +4,26 @@ const defaultData = require('../data/data.json');
 
 const router = express.Router();
 
-// GET /api/content - Fetch website dynamic content
+// Helper function to deeply merge fallback default data with DB data
+function mergeSiteData(dbData) {
+  if (!dbData || typeof dbData !== 'object') return defaultData;
+
+  return {
+    ...defaultData,
+    ...dbData,
+    header: { ...defaultData.header, ...(dbData.header || {}) },
+    hero: { ...defaultData.hero, ...(dbData.hero || {}) },
+    servicesSection: { ...defaultData.servicesSection, ...(dbData.servicesSection || {}) },
+    solutionsSection: { ...defaultData.solutionsSection, ...(dbData.solutionsSection || {}) },
+    techStackSection: { ...defaultData.techStackSection, ...(dbData.techStackSection || {}) },
+    ctaBanner: { ...defaultData.ctaBanner, ...(dbData.ctaBanner || {}) },
+    hireDevSection: { ...defaultData.hireDevSection, ...(dbData.hireDevSection || {}) },
+    footer: { ...defaultData.footer, ...(dbData.footer || {}) },
+    officeLocations: dbData.officeLocations || defaultData.officeLocations
+  };
+}
+
+// GET /api/content - Fetch website dynamic content with complete data guarantees
 router.get('/', async (req, res) => {
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
 
@@ -17,9 +36,10 @@ router.get('/', async (req, res) => {
         .single();
 
       if (!error && data && data.data) {
+        const fullData = mergeSiteData(data.data);
         return res.status(200).json({
           success: true,
-          data: data.data
+          data: fullData
         });
       }
     }
