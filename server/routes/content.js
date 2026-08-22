@@ -1,6 +1,6 @@
 const express = require('express');
 const supabase = require('../config/supabaseClient');
-const defaultData = require('../../src/data/data.json');
+const defaultData = require('../data/data.json');
 
 const router = express.Router();
 
