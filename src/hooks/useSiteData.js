@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import defaultData from '../data/data.json';
 import { supabase } from '../lib/supabaseClient';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
 export function useSiteData() {
   const [data, setData] = useState(defaultData);
@@ -13,7 +13,7 @@ export function useSiteData() {
     // 1. Try Express Backend API
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 1000);
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
 
       const res = await fetch(`${API_BASE_URL}/api/content`, {
         signal: controller.signal
@@ -31,10 +31,10 @@ export function useSiteData() {
         }
       }
     } catch (err) {
-      console.warn('Backend API unavailable, attempting Direct Supabase DB query...', err.message);
+      console.warn('Backend API fetch notice:', err.message);
     }
 
-    // 2. Fallback to Direct Supabase DB fetch
+    // 2. Fallback to Direct Supabase DB fetch if Express API is unreachable
     if (supabase) {
       try {
         const { data: dbRow, error } = await supabase
