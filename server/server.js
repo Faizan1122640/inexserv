@@ -13,14 +13,20 @@ const authRouter = require('./routes/auth');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Configure CORS for Vite frontend and production origins
+// Configure CORS for Vite frontend and Vercel production origins
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
   : ['http://localhost:5173', 'https://inexserv.vercel.app'];
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+    if (
+      !origin ||
+      allowedOrigins.includes(origin) ||
+      allowedOrigins.includes('*') ||
+      origin.endsWith('.vercel.app') ||
+      origin.includes('localhost')
+    ) {
       return callback(null, true);
     }
     return callback(new Error(`CORS policy violation: Origin '${origin}' is not allowed`));
