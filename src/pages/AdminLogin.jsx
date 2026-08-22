@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../redux/authSlice';
 import { supabase } from '../lib/supabaseClient';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
