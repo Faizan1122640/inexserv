@@ -6,6 +6,8 @@ const router = express.Router();
 // GET /api/content - Fetch website dynamic content from Supabase site_content table
 router.get('/', async (req, res, next) => {
   try {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    
     const { data, error } = await supabase
       .from('site_content')
       .select('data')
