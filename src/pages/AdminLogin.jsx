@@ -19,7 +19,7 @@ export default function AdminLogin() {
     setErrorMsg('');
     setLoading(true);
 
-    // 1. Try Backend Express API if available
+    // 1. Try Backend Express API
     try {
       const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
@@ -27,19 +27,22 @@ export default function AdminLogin() {
         body: JSON.stringify({ email, password })
       });
 
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success && json.data) {
-          dispatch(loginSuccess({
-            token: json.data.token,
-            user: json.data.user
-          }));
-          navigate('/admin/dashboard');
-          return;
-        }
+      const json = await res.json();
+
+      if (res.ok && json.success && json.data) {
+        dispatch(loginSuccess({
+          token: json.data.token,
+          user: json.data.user
+        }));
+        navigate('/admin/dashboard');
+        return;
+      } else if (!res.ok && json && json.error && !json.error.includes('fetch')) {
+        setErrorMsg(json.error || 'Invalid credentials');
+        setLoading(false);
+        return;
       }
     } catch (apiErr) {
-      console.warn('Backend API login unavailable, attempting Direct Supabase Auth...', apiErr.message);
+      console.warn('Backend API login notice, trying Supabase Auth:', apiErr.message);
     }
 
     // 2. Try Direct Supabase Auth
@@ -59,18 +62,21 @@ export default function AdminLogin() {
           return;
         }
 
-        if (error && !error.message.includes('fetch')) {
-          setErrorMsg(error.message);
+        if (error) {
+          setErrorMsg(error.message || 'Invalid email or password');
           setLoading(false);
           return;
         }
       } catch (sbErr) {
-        console.warn('Supabase Auth network/preflight notice, using admin fallback:', sbErr.message);
+        console.warn('Supabase Auth notice:', sbErr.message);
       }
     }
 
-    // 3. Fallback Auth (Guarantees Admin Login if network/preflight fails)
-    if (email && password) {
+    // 3. Demo Credentials Check
+    const validEmails = ['admin@gmail.com', 'admin@inexserv.com'];
+    const validPasswords = ['admin123', 'admin@123'];
+
+    if (validEmails.includes(email.trim().toLowerCase()) && validPasswords.includes(password)) {
       dispatch(loginSuccess({
         token: 'admin-authenticated-token-12345',
         user: { email, role: 'admin' }
@@ -80,7 +86,8 @@ export default function AdminLogin() {
       return;
     }
 
-    setErrorMsg('Invalid credentials. Please enter email and password.');
+    // Access Denied on Invalid Credentials
+    setErrorMsg('Invalid email or password. Access Denied.');
     setLoading(false);
   };
 
@@ -94,8 +101,8 @@ export default function AdminLogin() {
         </div>
 
         {errorMsg && (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 text-sm text-red-700 rounded">
-            {errorMsg}
+          <div className="bg-red-50 border-l-4 border-red-500 p-4 text-sm text-red-700 rounded font-medium">
+            ⚠️ {errorMsg}
           </div>
         )}
 
