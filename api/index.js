@@ -1,9 +1,20 @@
 const express = require('express');
 const cors = require('cors');
-const defaultData = require('../server/data/data.json');
-const supabase = require('../server/config/supabaseClient');
+const { createClient } = require('@supabase/supabase-js');
+const defaultData = require('./data.json');
 
 const app = express();
+
+// Initialize Supabase Client safely
+const supabaseUrl = process.env.SUPABASE_URL || 'https://srpgbmsbgqippemtpdyw.supabase.co';
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNycGdibXNiZ3FpcHBlbXRwZHl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgxOTAwMTEsImV4cCI6MjA1Mzc2NjAxMX0.sample';
+
+let supabase = null;
+try {
+  supabase = createClient(supabaseUrl, supabaseAnonKey);
+} catch (err) {
+  console.warn('Supabase client creation notice:', err.message);
+}
 
 // CORS configuration allowing all origins in production/preview
 app.use(cors({

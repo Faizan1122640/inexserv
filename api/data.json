@@ -1,0 +1,495 @@
+{
+  "header": {
+    "navLinks": [
+      { "label": "About Us", "href": "/about-us" },
+      { "label": "Services", "href": "/services", "hasDropdown": true },
+      { "label": "Projects", "href": "/projects" },
+      { "label": "Industries", "href": "/industries" },
+      { "label": "Merchant Acquisition", "href": "/merchant-acquisition" },
+      { "label": "Insights", "href": "/insights" }
+    ],
+    "megaMenu": {
+      "title": "OUR SERVICES",
+      "description": "Transform your business ideas into reality with our tailored software development services.",
+      "items": [
+        {
+          "href": "/services/ai-development",
+          "label": "AI Development",
+          "desc": "Harness the power of AI to develop smart solutions that drive business efficiency & innovation.",
+          "img": "/images/servisec-manu/aidevelopment.svg"
+        },
+        {
+          "href": "/services/automation-tools",
+          "label": "Automation Tools",
+          "desc": "Empowering your business with custom software solutions tailored to your needs.",
+          "img": "/images/servisec-manu/devcops.svg"
+        },
+        {
+          "href": "/services/application-development",
+          "label": "Application Development",
+          "desc": "Let's build scalable and secure web applications to elevate your online presence.",
+          "img": "/images/servisec-manu/webdevelopment.svg"
+        },
+        {
+          "href": "/services/mobile-development",
+          "label": "Mobile App Development",
+          "desc": "Transforming innovative ideas into user-friendly and high-performing mobile apps.",
+          "img": "/images/servisec-manu/mobiledevelopment.svg"
+        },
+        {
+          "href": "/services/desktop-software",
+          "label": "Desktop Software",
+          "desc": "Build powerful desktop software with Electron or native installers for Windows, macOS.",
+          "img": "/images/servisec-manu/ecommerence.svg"
+        },
+        {
+          "href": "/services/blockchain-development",
+          "label": "Blockchain Development",
+          "desc": "Transform your business ideas into reality with our tailored software development services.",
+          "img": "/images/servisec-manu/blockchaincard.svg"
+        }
+      ]
+    },
+    "contactButtonText": "Contact Us"
+  },
+
+  "hero": {
+    "tagline": "Transforming Ideas into Impactful Software",
+    "titleLine1": "Innovate. Accelerate. Succeed.",
+    "titleLine2": "Empowering Your Vision",
+    "keywords": ["AI", "Blockchain", "Web Apps", "Mobile Apps", "DevOps", "Automation"],
+    "description": "IES is your trusted partner for custom software development services. We help forward-thinking businesses solve real-world problems with AI-powered tools, scalable SaaS platforms, mobile & web apps, and enterprise automation solutions. Let's build your next big thing—smarter, faster, and with measurable results.",
+    "ctaLetstalk": "Let's Talk",
+    "ctaLearnMore": "Learn More",
+    "partnerLogos": [
+      { "name": "Bank of Muscat", "src": "/images/bank.png" },
+      { "name": "BMW Group", "src": "/images/bmwgroup.png" },
+      { "name": "Oracle", "src": "/images/oracle.png" },
+      { "name": "Raast", "src": "/images/raast.png" },
+      { "name": "PayPak", "src": "/images/paypak.png" },
+      { "name": "Ecobank", "src": "/images/ecobank.png" },
+      { "name": "Logo 1", "src": "/images/logo1.png" },
+      { "name": "Logo 3", "src": "/images/logo3.png" }
+    ]
+  },
+
+  "servicesSection": {
+    "title": "Services",
+    "subtitle": "We specialize in developing corporate and consumer applications, driven by our deep expertise in cutting-edge technologies.",
+    "services": [
+      {
+        "title": "Application Development",
+        "href": "/services/application-development",
+        "img": "/images/webdevelopment.svg",
+        "desc": "We create scalable SaaS web applications using React, Next.js, Node.js, Vue.js, and Nuxt. Partner with a full-stack development company that delivers results for US businesses."
+      },
+      {
+        "title": "Mobile App Development",
+        "href": "/services/mobile-development",
+        "img": "/images/mobiledevelopment.svg",
+        "desc": "Reach your audience everywhere with iOS, Android, Flutter, and React Native apps. Our mobile app developers for startups and enterprises deliver seamless, user-friendly experiences."
+      },
+      {
+        "title": "AI Development",
+        "href": "/services/ai-development",
+        "img": "/images/aidevelopment.svg",
+        "desc": "Unlock business value with custom AI agents, chatbots, RAG pipelines, and voice/prompt interfaces. Build AI chatbot for business, automate workflows, and gain insights with our AI development company expertise."
+      },
+      {
+        "title": "Desktop Software",
+        "href": "/services/desktop-software",
+        "img": "/images/ecommerence.svg",
+        "desc": "Build powerful desktop software with Electron or native installers. We deliver secure, high-performance solutions for your business operations."
+      },
+      {
+        "title": "Automation Tools",
+        "href": "/services/automation-tools",
+        "img": "/images/devcops.svg",
+        "desc": "Streamline your business with CRM automations and workflow systems. Our enterprise automation solutions help you save time, reduce errors, and scale efficiently."
+      },
+      {
+        "title": "Blockchain Development",
+        "href": "/services/blockchain-development",
+        "img": "/images/blockchaincard.svg",
+        "desc": "Leverage secure, decentralized blockchain solutions for your business. We build smart contracts, DApps, and Web3 integrations to future-proof your operations."
+      }
+    ]
+  },
+
+  "solutionsSection": {
+    "title": "Solutions That Fit Your Stage",
+    "subtitle": "Whether you're building your first MVP, scaling operations, or fixing a failing product — we're here to help you win.",
+    "solutions": [
+      {
+        "subtitle": "I'm a",
+        "title": "Startup Founder",
+        "desc": "Got a game-changing idea? We turn your vision into a lean, testable MVP that attracts users and investors.",
+        "buttonText": "Launch My Idea",
+        "href": "/startupdevelopment"
+      },
+      {
+        "subtitle": "I run an",
+        "title": "Enterprise Team",
+        "desc": "Digitize workflows, modernize legacy systems, and scale fast with our full-stack enterprise solutions.",
+        "buttonText": "See What's Possible",
+        "href": "/enterprisedevelopment"
+      },
+      {
+        "subtitle": "I need a",
+        "title": "Tech Rescue",
+        "desc": "Behind schedule or stuck with bad code? Our rescue team jumps in, fixes the chaos, and gets your product back on track.",
+        "buttonText": "Fix My App",
+        "href": "/rescueservicesdevelopment"
+      }
+    ]
+  },
+
+  "techStackSection": {
+    "titlePrefix": "Forward-Thinking Software ",
+    "titleHighlight": "Development Services",
+    "subtitle": "Empowering businesses with innovative, scalable, and future-ready digital solutions.",
+    "categories": [
+      {
+        "id": "product-engineering",
+        "title": "Product Engineering",
+        "img": "/images/settingimage.svg",
+        "desc": "Our Product Engineering Services cover product management, design, development, DevOps, testing, security & more.",
+        "bullets": [
+          "Discovery Workshop",
+          "Software Quality Assurance",
+          "Custom Software Development",
+          "Web App Development"
+        ],
+        "techLogos": [
+          "/images/techlogos/s.svg",
+          "/images/techlogos/o.svg",
+          "/images/techlogos/p.svg",
+          "/images/techlogos/a.svg",
+          "/images/techlogos/i.svg",
+          "/images/techlogos/u.svg",
+          "/images/techlogos/y.svg",
+          "/images/techlogos/t.svg",
+          "/images/techlogos/r.svg",
+          "/images/techlogos/e.svg",
+          "/images/techlogos/w.svg",
+          "/images/techlogos/d.svg",
+          "/images/techlogos/q.svg"
+        ]
+      },
+      {
+        "id": "data-ai",
+        "title": "Data & Artificial Intelligence",
+        "img": "/images/DataArtificial.svg",
+        "desc": "We drive your business forward by crafting tomorrow's AI solutions today, ensuring they are futuristic enough to align with your unique goals and challenges.",
+        "bullets": [
+          "AI Strategy And Consulting",
+          "ML Model Deployment & Training",
+          "Natural Language Processing",
+          "Custom Computer Vision Solutions"
+        ],
+        "techLogos": [
+          "/images/data_ai_svgs/Page-1-2.svg",
+          "/images/data_ai_svgs/Mask_group_73_36e0f4bcaa.svg",
+          "/images/data_ai_svgs/Mask_group_61_3ebe3547d0.svg",
+          "/images/data_ai_svgs/Mask_group_74_643008704e.svg",
+          "/images/data_ai_svgs/Mask_group_45_60d1c401d0.svg",
+          "/images/data_ai_svgs/Mask_group_49_90bab0403f.svg",
+          "/images/data_ai_svgs/Mask_group_41_9c1e40cf7a.svg",
+          "/images/data_ai_svgs/Mask_group_40_2c92b87f03.svg",
+          "/images/data_ai_svgs/Clip path group.svg",
+          "/images/data_ai_svgs/Mask_group_34_ea54698b21.svg",
+          "/images/data_ai_svgs/Mask_group_37_966606d3fd.svg",
+          "/images/data_ai_svgs/Mask_group_26_3511327a4d.svg"
+        ]
+      },
+      {
+        "id": "hire-dev",
+        "title": "Hire Dev",
+        "img": "/images/HireDev.svg",
+        "desc": "IES helps you hire, acquire, and retain top development talent. Boost your in-house team or build your own dev center.",
+        "bullets": [
+          "Staff Augmentation",
+          "Hire By Role",
+          "Dedicated Teams",
+          "Hire By Technology"
+        ],
+        "techLogos": [
+          "/images/techlogos/1.svg",
+          "/images/techlogos/2.svg",
+          "/images/techlogos/3.svg",
+          "/images/techlogos/4.svg",
+          "/images/techlogos/5.svg",
+          "/images/techlogos/6.svg",
+          "/images/techlogos/7.svg",
+          "/images/techlogos/31.svg",
+          "/images/techlogos/8.svg",
+          "/images/techlogos/9.svg",
+          "/images/techlogos/10.svg",
+          "/images/techlogos/11.svg",
+          "/images/techlogos/12.svg",
+          "/images/techlogos/13.svg",
+          "/images/techlogos/14.svg",
+          "/images/techlogos/15.svg",
+          "/images/techlogos/16.svg",
+          "/images/techlogos/17.svg",
+          "/images/techlogos/18.svg",
+          "/images/techlogos/19.svg",
+          "/images/techlogos/20.svg",
+          "/images/techlogos/21.svg"
+        ]
+      },
+      {
+        "id": "devops-cloudops",
+        "title": "DevOps & CloudOps",
+        "img": "/images/DevOpsCloudOps.svg",
+        "desc": "We optimize operations with advanced DevOps and CloudOps strategies while boosting agility & scalability in technology deployments.",
+        "bullets": [
+          "CI/CD As a Service",
+          "Security And Compliance",
+          "Infrastructure As Code",
+          "Cloud Migration"
+        ],
+        "techLogos": [
+          "/images/techlogos/z.svg",
+          "/images/techlogos/x.svg",
+          "/images/techlogos/c.svg",
+          "/images/techlogos/v.svg",
+          "/images/techlogos/b.svg",
+          "/images/techlogos/n.svg",
+          "/images/techlogos/m.svg",
+          "/images/techlogos/l.svg",
+          "/images/techlogos/k.svg",
+          "/images/techlogos/j.svg",
+          "/images/techlogos/h.svg"
+        ]
+      },
+      {
+        "id": "emerging-tech",
+        "title": "Emerging Technologies",
+        "img": "/images/EmergingTechnologies.svg",
+        "desc": "We're dedicated to the latest IT trends, integrating immersive experiences, augmented reality, and virtual reality to provide you with reliable and innovative solutions.",
+        "bullets": [
+          "Metaverse",
+          "Apple Vision Pro",
+          "AR/VR",
+          "Cyber Security"
+        ],
+        "techLogos": [
+          "/images/techlogos/111.svg",
+          "/images/techlogos/22.svg",
+          "/images/techlogos/33.svg",
+          "/images/techlogos/44.svg",
+          "/images/techlogos/55.svg",
+          "/images/techlogos/66.svg",
+          "/images/techlogos/77.svg",
+          "/images/techlogos/88.svg",
+          "/images/techlogos/99.svg",
+          "/images/techlogos/00.svg",
+          "/images/techlogos/qq.svg",
+          "/images/techlogos/ww.svg",
+          "/images/techlogos/ee.svg",
+          "/images/techlogos/rr.svg",
+          "/images/techlogos/tt.svg"
+        ]
+      },
+      {
+        "id": "blockchain-web3",
+        "title": "Blockchain & Web 3.0",
+        "img": "/images/BlockchainWeb.svg",
+        "desc": "Transform your business ideas into reality with our tailored software development services.",
+        "bullets": [
+          "Smart Contract Development",
+          "Decentralized Apps (DApps)",
+          "Tokenomics & DeFi Protocols",
+          "Web3 Security Auditing"
+        ],
+        "techLogos": [
+          "/images/techlogos/ss1.svg",
+          "/images/techlogos/ss2.svg",
+          "/images/techlogos/ss3.svg",
+          "/images/techlogos/ss4.svg",
+          "/images/techlogos/ss5.svg",
+          "/images/techlogos/ss6.svg",
+          "/images/techlogos/ss7.svg",
+          "/images/techlogos/ss8.svg",
+          "/images/techlogos/ss9.svg",
+          "/images/techlogos/ss0.svg",
+          "/images/techlogos/ssq.svg"
+        ]
+      }
+    ]
+  },
+
+  "ctaBanner": {
+    "titleLine1": "Let's Build Something",
+    "titleLine2": "Great Together",
+    "paragraph": "Partner with IES to transform your ideas into powerful digital solutions that drive real business results.",
+    "buttonText": "Get Started"
+  },
+
+  "hireDevSection": {
+    "titlePart1": "Hire Developers and ",
+    "titlePart2": "Build Your Team",
+    "searchPlaceholder": "What are you looking for?",
+    "description": "We have established our business by assembling a team of highly skilled developers, proficient in the frameworks and technologies that power modern solutions.",
+    "hireCategories": [
+      {
+        "id": "frontend",
+        "name": "Front-End",
+        "techs": [
+          { "name": "HTML", "logo": "/images/tech-stack-images/html.svg" },
+          { "name": "CSS", "logo": "/images/tech-stack-images/css.svg" },
+          { "name": "Javascript", "logo": "/images/tech-stack-images/js.svg" },
+          { "name": "SaaS", "logo": "/images/tech-stack-images/saas.svg" },
+          { "name": "React JS", "logo": "/images/tech-stack-images/react.svg" },
+          { "name": "Vue JS", "logo": "/images/tech-stack-images/vue.svg" },
+          { "name": "Angular", "logo": "/images/tech-stack-images/angular.svg" },
+          { "name": "Meteor JS", "logo": "/images/tech-stack-images/meteor.svg" },
+          { "name": "Nuxt JS", "logo": "/images/tech-stack-images/nuxt.svg" },
+          { "name": "WebGL", "logo": "/images/tech-stack-images/webgl.svg" }
+        ]
+      },
+      {
+        "id": "backend",
+        "name": "Back-End",
+        "techs": [
+          { "name": "Node-js", "logo": "/images/tech-stack-images/Node-js.svg" },
+          { "name": "Golang", "logo": "/images/tech-stack-images/go.svg" },
+          { "name": "C#", "logo": "/images/tech-stack-images/c.svg" },
+          { "name": "Nest-js", "logo": "/images/tech-stack-images/tt.svg" }
+        ]
+      },
+      {
+        "id": "lownocode",
+        "name": "Low/No Code",
+        "techs": [
+          { "name": "Shopify", "logo": "/images/tech-stack-images/Shopify.jpg" },
+          { "name": "Wordpress", "logo": "/images/tech-stack-images/Wordpress.png" },
+          { "name": "Zoho", "logo": "/images/tech-stack-images/zoho.svg" },
+          { "name": "Zapier", "logo": "/images/tech-stack-images/Zapier.png" },
+          { "name": "Wix", "logo": "/images/tech-stack-images/wix.png" },
+          { "name": "HubSpot", "logo": "/images/tech-stack-images/hubspot.svg" },
+          { "name": "GHL", "logo": "/images/tech-stack-images/GHL.jpg" }
+        ]
+      },
+      {
+        "id": "database",
+        "name": "Database",
+        "techs": [
+          { "name": "Firebase", "logo": "/images/tech-stack-images/Firebase.svg" },
+          { "name": "Mongodb", "logo": "/images/tech-stack-images/Mongodb.svg" },
+          { "name": "Postgresql", "logo": "/images/tech-stack-images/Postgresql.svg" },
+          { "name": "Sqlite", "logo": "/images/tech-stack-images/Sqlite.svg" },
+          { "name": "Ms-sql", "logo": "/images/tech-stack-images/Ms-sql.svg" },
+          { "name": "Aws-dynamodb", "logo": "/images/tech-stack-images/Aws-dynamodb.svg" },
+          { "name": "Mysql", "logo": "/images/tech-stack-images/Mysql.svg" },
+          { "name": "Redis", "logo": "/images/tech-stack-images/Redis.svg" }
+        ]
+      },
+      {
+        "id": "devops",
+        "name": "DevOps",
+        "techs": [
+          { "name": "Aws", "logo": "/images/tech-stack-images/awss.svg" },
+          { "name": "Jenkins", "logo": "/images/tech-stack-images/jenkins.svg" },
+          { "name": "Docker", "logo": "/images/tech-stack-images/docker.svg" }
+        ]
+      },
+      {
+        "id": "mobile",
+        "name": "Mobile",
+        "techs": [
+          { "name": "React Native", "logo": "/images/tech-stack-images/reactnative.svg" },
+          { "name": "Flutter", "logo": "/images/tech-stack-images/flutter.svg" }
+        ]
+      },
+      {
+        "id": "aiml",
+        "name": "AI & ML",
+        "techs": [
+          { "name": "Tensorflow", "logo": "/images/tech-stack-images/Tensorflow.svg" },
+          { "name": "Keras", "logo": "/images/tech-stack-images/Keras.svg" },
+          { "name": "Pytorch", "logo": "/images/tech-stack-images/Pytorch.svg" },
+          { "name": "Lisp", "logo": "/images/tech-stack-images/Lisp.svg" },
+          { "name": "NTKL", "logo": "/images/tech-stack-images/NTKL.svg" },
+          { "name": "Spacy", "logo": "/images/tech-stack-images/Spacy.svg" },
+          { "name": "Open-ai", "logo": "/images/tech-stack-images/Open-ai.svg" },
+          { "name": "Plotly", "logo": "/images/tech-stack-images/Plotly.svg" },
+          { "name": "Matplotlib", "logo": "/images/tech-stack-images/Matplotlib.svg" },
+          { "name": "Pandas", "logo": "/images/tech-stack-images/Pandas.svg" },
+          { "name": "Opencv", "logo": "/images/tech-stack-images/Opencv.svg" },
+          { "name": "Numpy", "logo": "/images/tech-stack-images/Numpy.svg" },
+          { "name": "Scikit_learn", "logo": "/images/tech-stack-images/Scikit_learn.svg" },
+          { "name": "Mistral", "logo": "/images/tech-stack-images/Mistral.svg" },
+          { "name": "DeepSeek", "logo": "/images/tech-stack-images/DeepSeek.svg" },
+          { "name": "llamas", "logo": "/images/tech-stack-images/llamas.svg" },
+          { "name": "Langflow", "logo": "/images/tech-stack-images/Langflow.svg" }
+        ]
+      }
+    ]
+  },
+
+  "officeLocations": [
+    {
+      "country": "USA",
+      "flag": "/images/usa.svg",
+      "address": "30 N Gould St, Ste N, Sheridan, WY 82801",
+      "phone": "+1 307-461-1234"
+    },
+    {
+      "country": "UAE",
+      "flag": "/images/dubai.svg",
+      "address": "Office 2603, Floor 26 Aspin Tower, Sheikh Zayed Road, Dubai, UAE.",
+      "phone": "+971 58 535 7767"
+    },
+    {
+      "country": "OMAN",
+      "flag": "/images/omans.svg",
+      "address": "P.O.Box 128, Al Qurum, Postal Code 102, Sultanate of Oman.",
+      "phone": "+968 9577 3070"
+    }
+  ],
+
+  "footer": {
+    "consultationTitle": "Let's talk about your project",
+    "consultationDesc": "Have a project in mind? Talk to us directly and get personalized guidance every step of the way.",
+    "consultationButtonText": "BOOK A CONSULTATION - IT'S FREE",
+    "logo": "/images/inexserv-white.avif",
+    "strategicConsultingParagraph": "IES LLC is practicing global strategic consulting for over 10+ years, we partner with leaders from business and society to overcome the greatest challenges and capture their greatest opportunities. Our success depends on our ability to collaborate deeply and on our ability to work across cultures to improve ourselves and the world.",
+    "letsTalkButtonText": "Let's Talk",
+    "servicesLinks": [
+      { "label": "Application Development", "href": "/services/application-development" },
+      { "label": "Mobile Development", "href": "/services/mobile-development" },
+      { "label": "AI Development", "href": "/services/ai-development" },
+      { "label": "Blockchain Development", "href": "/services/blockchain-development" },
+      { "label": "Desktop Development", "href": "/services/desktop-software" },
+      { "label": "Automation Tools", "href": "/services/automation-tools" }
+    ],
+    "quickLinks": [
+      { "label": "About Us", "href": "/about-us" },
+      { "label": "Services", "href": "/services" },
+      { "label": "Projects", "href": "/projects" },
+      { "label": "Merchant Acquisition", "href": "/merchant-acquisition" },
+      { "label": "Insights", "href": "/insights" },
+      { "label": "Contact Us", "href": "/contact-us" }
+    ],
+    "contactInfo": {
+      "address": "P.O.Box 128, Al Qurum, Postal Code 102, Sultanate of Oman.",
+      "emails": ["Info@inexserv.com", "management@inexserv.com"],
+      "phone": "+968 9577 3070"
+    },
+    "socialLinks": [
+      { "platform": "facebook", "url": "https://www.facebook.com" },
+      { "platform": "twitter", "url": "https://twitter.com" },
+      { "platform": "linkedin", "url": "https://www.linkedin.com" },
+      { "platform": "instagram", "url": "https://instagram.com" }
+    ],
+    "copyright": "© 2026 All Rights Reserved to Integrated Excellence Services LLC",
+    "policyLinks": [
+      { "label": "Sitemap", "href": "/sitemap" },
+      { "label": "Privacy Policy", "href": "/privacy-policy" },
+      { "label": "IMS Policy", "href": "/ims-policy" },
+      { "label": "Terms & Conditions", "href": "/terms-and-conditions" }
+    ]
+  }
+}
