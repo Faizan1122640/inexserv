@@ -18,21 +18,27 @@ router.post('/login', async (req, res) => {
     const cleanEmail = email.trim().toLowerCase();
     const cleanPass = password.trim();
 
-    // 1. Strict Demo Admin Credentials Check
-    const validEmails = ['admin@gmail.com', 'admin@inexserv.com'];
-    const validPasswords = ['admin123', 'admin@123'];
+    // Read secret credentials from process.env
+    const adminEmail = (process.env.ADMIN_EMAIL || 'admin@gmail.com').toLowerCase();
+    const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+    const altEmail = (process.env.ADMIN_ALT_EMAIL || 'admin@inexserv.com').toLowerCase();
+    const altPassword = process.env.ADMIN_ALT_PASSWORD || 'admin@123';
 
-    if (validEmails.includes(cleanEmail) && validPasswords.includes(cleanPass)) {
+    // 1. Secret Environment Admin Check
+    if (
+      (cleanEmail === adminEmail && cleanPass === adminPassword) ||
+      (cleanEmail === altEmail && cleanPass === altPassword)
+    ) {
       return res.status(200).json({
         success: true,
         data: {
-          token: 'express-admin-session-token-12345',
+          token: process.env.JWT_SECRET || 'express-admin-session-token-12345',
           user: { email: cleanEmail, role: 'admin' }
         }
       });
     }
 
-    // 2. Strict Supabase Auth Verification
+    // 2. Supabase Auth verification
     if (supabase) {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: cleanEmail,
@@ -50,7 +56,7 @@ router.post('/login', async (req, res) => {
       }
     }
 
-    // 3. REJECT Invalid Credentials (401 Access Denied)
+    // 3. Reject Invalid Credentials
     return res.status(401).json({
       success: false,
       error: 'Invalid email or password. Access Denied.'

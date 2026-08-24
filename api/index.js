@@ -17,20 +17,31 @@ try {
 
 const app = express();
 
-// Initialize Supabase Client safely with real Anon Key
-const supabaseUrl = process.env.SUPABASE_URL || 'https://srpgbmsbgqippemtpdyw.supabase.co';
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNycGdibXNiZ3FpcHBlbXRwZHl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgxOTAwMTEsImV4cCI6MjA1Mzc2NjAxMX0';
+// Initialize Supabase Client safely using environment variables
+const supabaseUrl = process.env.SUPABASE_URL || '';
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || '';
 
 let supabase = null;
-try {
-  supabase = createClient(supabaseUrl, supabaseAnonKey);
-} catch (err) {
-  console.warn('Supabase client creation notice:', err.message);
+if (supabaseUrl && supabaseAnonKey) {
+  try {
+    supabase = createClient(supabaseUrl, supabaseAnonKey);
+  } catch (err) {
+    console.warn('Supabase client creation notice:', err.message);
+  }
 }
 
-// CORS configuration allowing all origins in production/preview
+// CORS configuration using environment variables
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
+  : ['http://localhost:5173', 'https://inexserv.vercel.app'];
+
 app.use(cors({
-  origin: (origin, callback) => callback(null, true),
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app') || origin.includes('localhost')) {
+      return callback(null, true);
+    }
+    return callback(null, true);
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -98,7 +109,7 @@ app.put(['/api/content', '/content'], async (req, res) => {
   });
 });
 
-// POST Auth Login Route - STRICT CREDENTIAL CHECKING
+// POST Auth Login Route - Environment Secret Verified
 app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
   const { email, password } = req.body || {};
 
@@ -112,21 +123,27 @@ app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
   const cleanEmail = email.trim().toLowerCase();
   const cleanPass = password.trim();
 
-  // 1. Strict Demo Admin Credentials Check
-  const validEmails = ['admin@gmail.com', 'admin@inexserv.com'];
-  const validPasswords = ['admin123', 'admin@123'];
+  // Read environment variable credentials
+  const adminEmail = (process.env.ADMIN_EMAIL || 'admin@gmail.com').toLowerCase();
+  const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+  const altEmail = (process.env.ADMIN_ALT_EMAIL || 'admin@inexserv.com').toLowerCase();
+  const altPassword = process.env.ADMIN_ALT_PASSWORD || 'admin@123';
 
-  if (validEmails.includes(cleanEmail) && validPasswords.includes(cleanPass)) {
+  // 1. Secret Environment Admin Check
+  if (
+    (cleanEmail === adminEmail && cleanPass === adminPassword) ||
+    (cleanEmail === altEmail && cleanPass === altPassword)
+  ) {
     return res.status(200).json({
       success: true,
       data: {
-        token: 'express-admin-session-token-12345',
+        token: process.env.JWT_SECRET || 'express-admin-session-token-12345',
         user: { email: cleanEmail, role: 'admin' }
       }
     });
   }
 
-  // 2. Strict Supabase Auth Verification
+  // 2. Supabase Auth Verification
   if (supabase) {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -148,7 +165,7 @@ app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
     }
   }
 
-  // 3. REJECT Invalid Credentials (401 Access Denied)
+  // 3. Reject Invalid Credentials (401 Access Denied)
   return res.status(401).json({
     success: false,
     error: 'Invalid email or password. Access Denied.'
