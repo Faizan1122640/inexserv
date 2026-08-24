@@ -78,7 +78,8 @@ app.use((err, req, res, next) => {
   });
 });
 
-if (process.env.NODE_ENV !== 'production' || !module.parent) {
+// Only listen on port if running directly via CLI (not imported by Vercel serverless)
+if (!process.env.VERCEL && !process.env.VERCEL_ENV && require.main === module) {
   app.listen(PORT, () => {
     console.log(`🚀 CRM Backend Server running on http://localhost:${PORT}`);
     console.log(`🔒 Allowed CORS Origins: ${allowedOrigins.join(', ')}`);
