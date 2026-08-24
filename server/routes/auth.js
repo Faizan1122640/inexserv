@@ -15,21 +15,26 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Demo / fallback credentials
-    if ((email === 'admin@gmail.com' || email === 'admin@inexserv.com') && (password === 'admin123' || password === 'admin@123')) {
+    const cleanEmail = email.trim().toLowerCase();
+
+    // 1. Demo / fallback credentials check
+    const validEmails = ['admin@gmail.com', 'admin@inexserv.com'];
+    const validPasswords = ['admin123', 'admin@123'];
+
+    if (validEmails.includes(cleanEmail) && validPasswords.includes(password)) {
       return res.status(200).json({
         success: true,
         data: {
           token: 'express-admin-session-token-12345',
-          user: { email, role: 'admin' }
+          user: { email: cleanEmail, role: 'admin' }
         }
       });
     }
 
-    // Supabase Auth verification
+    // 2. Supabase Auth verification
     if (supabase) {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+        email: cleanEmail,
         password
       });
 
@@ -44,21 +49,15 @@ router.post('/login', async (req, res) => {
       }
     }
 
-    // Default admin session response if credentials present
-    return res.status(200).json({
-      success: true,
-      data: {
-        token: 'express-admin-session-token-12345',
-        user: { email, role: 'admin' }
-      }
+    // 3. Reject Wrong Credentials
+    return res.status(401).json({
+      success: false,
+      error: 'Invalid email or password. Access Denied.'
     });
   } catch (err) {
-    return res.status(200).json({
-      success: true,
-      data: {
-        token: 'express-admin-session-token-12345',
-        user: { email: req.body?.email || 'admin@gmail.com', role: 'admin' }
-      }
+    return res.status(401).json({
+      success: false,
+      error: 'Invalid email or password. Access Denied.'
     });
   }
 });

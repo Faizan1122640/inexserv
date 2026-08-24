@@ -98,7 +98,7 @@ app.put(['/api/content', '/content'], async (req, res) => {
   });
 });
 
-// POST Auth Login Route
+// POST Auth Login Route - Strictly Validated
 app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
   const { email, password } = req.body || {};
 
@@ -109,11 +109,27 @@ app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
     });
   }
 
-  // Supabase Auth verification if available
+  const cleanEmail = email.trim().toLowerCase();
+
+  // 1. Check Demo Admin Credentials
+  const validEmails = ['admin@gmail.com', 'admin@inexserv.com'];
+  const validPasswords = ['admin123', 'admin@123'];
+
+  if (validEmails.includes(cleanEmail) && validPasswords.includes(password)) {
+    return res.status(200).json({
+      success: true,
+      data: {
+        token: 'express-admin-session-token-12345',
+        user: { email: cleanEmail, role: 'admin' }
+      }
+    });
+  }
+
+  // 2. Check Supabase Auth Verification
   if (supabase) {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+        email: cleanEmail,
         password
       });
 
@@ -131,13 +147,10 @@ app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
     }
   }
 
-  // Guaranteed admin session fallback
-  return res.status(200).json({
-    success: true,
-    data: {
-      token: 'express-admin-session-token-12345',
-      user: { email, role: 'admin' }
-    }
+  // 3. Reject Wrong Credentials (401 Unauthorized)
+  return res.status(401).json({
+    success: false,
+    error: 'Invalid email or password. Access Denied.'
   });
 });
 
