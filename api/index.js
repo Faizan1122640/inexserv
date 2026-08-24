@@ -98,7 +98,7 @@ app.put(['/api/content', '/content'], async (req, res) => {
   });
 });
 
-// POST Auth Login Route - Flexible & Secure Admin Credentials
+// POST Auth Login Route - STRICT CREDENTIAL CHECKING
 app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
   const { email, password } = req.body || {};
 
@@ -112,26 +112,21 @@ app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
   const cleanEmail = email.trim().toLowerCase();
   const cleanPass = password.trim();
 
-  // 1. Check Demo Admin Credentials (flexible for admin logins)
-  const validEmails = ['admin@gmail.com', 'admin@inexserv.com', 'admin@admin.com', 'admin'];
-  const validPasswords = ['admin123', 'admin@123', 'admin', 'Admin123', 'admin1234', '123456', 'password'];
+  // 1. Strict Demo Admin Credentials Check
+  const validEmails = ['admin@gmail.com', 'admin@inexserv.com'];
+  const validPasswords = ['admin123', 'admin@123'];
 
-  if (
-    validEmails.includes(cleanEmail) ||
-    cleanEmail.startsWith('admin')
-  ) {
-    if (validPasswords.includes(cleanPass) || cleanPass.length >= 4) {
-      return res.status(200).json({
-        success: true,
-        data: {
-          token: 'express-admin-session-token-12345',
-          user: { email: cleanEmail, role: 'admin' }
-        }
-      });
-    }
+  if (validEmails.includes(cleanEmail) && validPasswords.includes(cleanPass)) {
+    return res.status(200).json({
+      success: true,
+      data: {
+        token: 'express-admin-session-token-12345',
+        user: { email: cleanEmail, role: 'admin' }
+      }
+    });
   }
 
-  // 2. Check Supabase Auth Verification
+  // 2. Strict Supabase Auth Verification
   if (supabase) {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -153,7 +148,7 @@ app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
     }
   }
 
-  // 3. Reject Only Completely Invalid Credentials
+  // 3. REJECT Invalid Credentials (401 Access Denied)
   return res.status(401).json({
     success: false,
     error: 'Invalid email or password. Access Denied.'

@@ -30,22 +30,26 @@ export default function AdminLogin() {
         body: JSON.stringify({ email: cleanEmail, password: cleanPass })
       });
 
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success && json.data) {
-          dispatch(loginSuccess({
-            token: json.data.token,
-            user: json.data.user
-          }));
-          navigate('/admin/dashboard');
-          return;
-        }
+      const json = await res.json();
+
+      if (res.ok && json.success && json.data) {
+        dispatch(loginSuccess({
+          token: json.data.token,
+          user: json.data.user
+        }));
+        navigate('/admin/dashboard');
+        return;
+      } else {
+        // Express API explicitly rejected login with 401 Access Denied
+        setErrorMsg(json.error || 'Invalid email or password. Access Denied.');
+        setLoading(false);
+        return;
       }
     } catch (apiErr) {
-      console.warn('Backend API login notice, trying Supabase Auth:', apiErr.message);
+      console.warn('Backend API login offline, attempting Direct Supabase Auth:', apiErr.message);
     }
 
-    // 2. Try Direct Supabase Auth
+    // 2. Try Direct Supabase Auth (Fallback if Express API offline)
     if (supabase) {
       try {
         const { data, error } = await supabase.auth.signInWithPassword({
@@ -61,29 +65,18 @@ export default function AdminLogin() {
           navigate('/admin/dashboard');
           return;
         }
+
+        if (error) {
+          setErrorMsg(error.message || 'Invalid email or password. Access Denied.');
+          setLoading(false);
+          return;
+        }
       } catch (sbErr) {
         console.warn('Supabase Auth notice:', sbErr.message);
       }
     }
 
-    // 3. Admin Credentials Match Check
-    const validEmails = ['admin@gmail.com', 'admin@inexserv.com', 'admin@admin.com', 'admin'];
-    const validPasswords = ['admin123', 'admin@123', 'admin', 'Admin123', 'admin1234', '123456', 'password'];
-
-    if (
-      (validEmails.includes(cleanEmail) || cleanEmail.startsWith('admin')) &&
-      (validPasswords.includes(cleanPass) || cleanPass.length >= 4)
-    ) {
-      dispatch(loginSuccess({
-        token: 'admin-authenticated-token-12345',
-        user: { email: cleanEmail, role: 'admin' }
-      }));
-      navigate('/admin/dashboard');
-      setLoading(false);
-      return;
-    }
-
-    // Access Denied on Invalid Credentials
+    // 3. Reject Wrong Credentials (Client-side fallback)
     setErrorMsg('Invalid email or password. Access Denied.');
     setLoading(false);
   };
