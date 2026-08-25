@@ -1,14 +1,19 @@
 const express = require('express');
+const fs = require('fs').promises;
+const path = require('path');
 const supabase = require('../config/supabaseClient');
 const defaultData = require('../data/data.json');
 
 const router = express.Router();
+const fallbackDataPath = path.join(__dirname, '..', 'data', 'data.json');
+let currentData = defaultData;
 
 // GET /api/content - Fetch website dynamic content with 100% fail-safe guarantees
 router.get('/', async (req, res) => {
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
 
-  let responseData = defaultData;
+  let responseData = currentData;
+  let storage = 'local-file';
 
   try {
     if (supabase) {
@@ -24,6 +29,8 @@ router.get('/', async (req, res) => {
             ...defaultData,
             ...data.data
           };
+          currentData = responseData;
+          storage = 'supabase';
         }
       } catch (sbErr) {
         console.warn('Supabase DB fetch notice:', sbErr.message);
@@ -35,7 +42,8 @@ router.get('/', async (req, res) => {
 
   return res.status(200).json({
     success: true,
-    data: responseData
+    data: responseData,
+    storage
   });
 });
 
@@ -62,10 +70,16 @@ router.put('/', async (req, res) => {
           })
           .select();
 
-        if (!error && data) {
+        if (error) {
+          throw error;
+        }
+
+        if (data) {
+          currentData = data[0] ? data[0].data : newContent;
           return res.status(200).json({
             success: true,
-            data: data[0] ? data[0].data : newContent
+            data: currentData,
+            storage: 'supabase'
           });
         }
       } catch (sbErr) {
@@ -76,10 +90,29 @@ router.put('/', async (req, res) => {
     console.warn('PUT /api/content error fallback:', err.message);
   }
 
-  return res.status(200).json({
-    success: true,
-    data: newContent
-  });
+  if (process.env.VERCEL || process.env.VERCEL_ENV) {
+    return res.status(503).json({
+      success: false,
+      error: 'Content storage is unavailable. Check the Supabase API key and permissions.'
+    });
+  }
+
+  try {
+    await fs.writeFile(fallbackDataPath, `${JSON.stringify(newContent, null, 2)}\n`, 'utf8');
+    currentData = newContent;
+
+    return res.status(200).json({
+      success: true,
+      data: currentData,
+      storage: 'local-file'
+    });
+  } catch (fileErr) {
+    console.error('Local content persistence error:', fileErr.message);
+    return res.status(500).json({
+      success: false,
+      error: 'Content could not be persisted'
+    });
+  }
 });
 
 module.exports = router;

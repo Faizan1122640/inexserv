@@ -3,12 +3,19 @@ import defaultData from '../data/data.json';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
-export function useSiteData() {
-  const [data, setData] = useState(defaultData);
-  const [loading, setLoading] = useState(true);
-  const [isUsingBackend, setIsUsingBackend] = useState(false);
+// In-memory global cache & promise deduplicator to prevent duplicate network calls
+let globalSiteData = null;
+let inFlightFetchPromise = null;
 
-  const fetchContent = async () => {
+async function fetchSiteDataOnce() {
+  if (globalSiteData) {
+    return globalSiteData;
+  }
+  if (inFlightFetchPromise) {
+    return inFlightFetchPromise;
+  }
+
+  inFlightFetchPromise = (async () => {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 4000);
@@ -22,38 +29,87 @@ export function useSiteData() {
       if (res.ok) {
         const json = await res.json();
         if (json.success && json.data) {
-          const merged = {
-            ...defaultData,
-            ...json.data
+          globalSiteData = {
+            data: {
+              ...defaultData,
+              ...json.data
+            },
+            isUsingBackend: true,
+            isUsingSupabase: json.storage === 'supabase'
           };
-          setData(merged);
-          setIsUsingBackend(true);
+          return globalSiteData;
         }
       }
     } catch (err) {
-      console.warn('Express Backend API fetch notice: using local data.json fallback', err.message);
+      console.warn('Express Backend API fetch notice: using local fallback', err.message);
     } finally {
-      setLoading(false);
+      inFlightFetchPromise = null;
     }
+
+    globalSiteData = {
+      data: defaultData,
+      isUsingBackend: false,
+      isUsingSupabase: false
+    };
+    return globalSiteData;
+  })();
+
+  return inFlightFetchPromise;
+}
+
+export function useSiteData() {
+  const [data, setData] = useState(globalSiteData?.data || defaultData);
+  const [loading, setLoading] = useState(!globalSiteData);
+  const [isUsingBackend, setIsUsingBackend] = useState(globalSiteData?.isUsingBackend || false);
+  const [isUsingSupabase, setIsUsingSupabase] = useState(globalSiteData?.isUsingSupabase || false);
+
+  const refresh = async () => {
+    globalSiteData = null;
+    inFlightFetchPromise = null;
+    setLoading(true);
+    const result = await fetchSiteDataOnce();
+    setData(result.data);
+    setIsUsingBackend(result.isUsingBackend);
+    setIsUsingSupabase(result.isUsingSupabase);
+    setLoading(false);
   };
 
   useEffect(() => {
-    fetchContent();
+    let isMounted = true;
+    fetchSiteDataOnce().then((result) => {
+      if (isMounted && result) {
+        setData(result.data);
+        setIsUsingBackend(result.isUsingBackend);
+        setIsUsingSupabase(result.isUsingSupabase);
+        setLoading(false);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const updateSiteData = async (newData) => {
     setData(newData);
+    globalSiteData = {
+      data: newData,
+      isUsingBackend: true,
+      isUsingSupabase: true
+    };
+
     try {
       const res = await fetch(`${API_BASE_URL}/api/content`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newData)
       });
+      const json = await res.json();
       if (!res.ok) {
-        const errJson = await res.json();
-        throw new Error(errJson.error || 'Failed to update content via Express API');
+        throw new Error(json.error || 'Failed to update content via Express API');
       }
       setIsUsingBackend(true);
+      setIsUsingSupabase(json.storage === 'supabase');
     } catch (err) {
       console.error('Failed to update content via Express API:', err);
       throw err;
@@ -64,9 +120,9 @@ export function useSiteData() {
     data,
     setData,
     loading,
-    isUsingSupabase: isUsingBackend,
+    isUsingSupabase,
     isUsingBackend,
     updateSiteData,
-    refresh: fetchContent
+    refresh
   };
 }

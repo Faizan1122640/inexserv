@@ -6,22 +6,48 @@ import { useSiteData } from '../hooks/useSiteData';
 import { supabase } from '../lib/supabaseClient';
 import defaultData from '../data/data.json';
 
+// Admin Components
+import AdminSidebar from '../components/admin/AdminSidebar';
+import AdminNavbar from '../components/admin/AdminNavbar';
+import AdminContentEditor from '../components/admin/AdminContentEditor';
+
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { data, loading, isUsingSupabase, updateSiteData } = useSiteData();
-  const [activeTab, setActiveTab] = useState('hero');
-  const [formData, setFormData] = useState(null);
-  const [statusMsg, setStatusMsg] = useState('');
-  const [saving, setSaving] = useState(false);
+  const { data, loading, isUsingSupabase, isUsingBackend, updateSiteData } = useSiteData();
 
+  // Sidebar & Section State
+  const [activeCmsSection, setActiveCmsSection] = useState('hero');
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // CMS Form Data
+  const [formData, setFormData] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState(null); // { type: 'success' | 'error', text: '' }
+
+  const cmsSections = [
+    { id: 'header', label: 'Header & Mega Menu', title: 'Header & Navigation Editor' },
+    { id: 'hero', label: 'Hero & Keywords', title: 'Hero Section Editor' },
+    { id: 'servicesSection', label: 'Services Cards', title: 'Services Section Editor' },
+    { id: 'solutionsSection', label: 'Solutions', title: 'Solutions Section Editor' },
+    { id: 'techStackSection', label: 'Tech Stack Categories', title: 'Tech Stack Editor' },
+    { id: 'hireDevSection', label: 'Hire Developers', title: 'Hire Developers Editor' },
+    { id: 'ctaBanner', label: 'CTA Banner', title: 'CTA Banner Editor' },
+    { id: 'officeLocations', label: 'Office Locations', title: 'Office Locations Editor' },
+    { id: 'footer', label: 'Footer & Contacts', title: 'Footer Editor' }
+  ];
+
+  // Auth Guard
   useEffect(() => {
-    const isAuth = localStorage.getItem('ies_admin_auth') || localStorage.getItem('admin_token');
+    const isAuth =
+      localStorage.getItem('ies_admin_auth') || localStorage.getItem('admin_token');
     if (!isAuth) {
       navigate('/admin/login');
     }
   }, [navigate]);
 
+  // Sync Form Data with Site Data
   useEffect(() => {
     if (data) {
       const merged = {
@@ -41,14 +67,56 @@ export default function AdminDashboard() {
     }
   }, [data]);
 
-  if (loading || !formData) {
-    return (
-      <div className="min-h-screen bg-[#074476] flex items-center justify-center text-white">
-        <p className="text-xl font-medium">Loading CMS Data...</p>
-      </div>
-    );
-  }
+  // Toast Notification helper
+  const showToast = (type, text) => {
+    setToast({ type, text });
+    setTimeout(() => {
+      setToast(null);
+    }, 4500);
+  };
 
+  // Save & Publish
+  const handleSave = async () => {
+    if (!formData) return;
+    setSaving(true);
+    try {
+      await updateSiteData(formData);
+      showToast('success', '✓ All changes published successfully and synchronized live!');
+    } catch (err) {
+      showToast('error', '❌ Error saving changes: ' + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Keyboard shortcut: Ctrl + S / Cmd + S to save
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        handleSave();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [formData]);
+
+  // Restore Default Content
+  const handleRestoreDefaults = async () => {
+    setSaving(true);
+    try {
+      const restored = JSON.parse(JSON.stringify(defaultData));
+      setFormData(restored);
+      await updateSiteData(restored);
+      showToast('success', '✓ Website content restored to original defaults successfully!');
+    } catch (err) {
+      showToast('error', '❌ Error restoring defaults: ' + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Logout
   const handleLogout = async () => {
     if (supabase) {
       try {
@@ -61,206 +129,99 @@ export default function AdminDashboard() {
     navigate('/admin/login');
   };
 
-  const handleSave = async () => {
-    setSaving(true);
-    setStatusMsg('');
-    try {
-      await updateSiteData(formData);
-      setStatusMsg('✓ All content updated successfully and published live!');
-    } catch (err) {
-      setStatusMsg('❌ Error updating content: ' + err.message);
-    } finally {
-      setSaving(false);
-    }
-  };
+  const activeCmsSectionMeta = cmsSections.find((s) => s.id === activeCmsSection);
 
-  const handleRestoreDefaultData = async () => {
-    if (window.confirm('⚠️ Are you sure you want to restore all website content to its original default (data.json)? This will recover all deleted cards, categories, and text.')) {
-      setSaving(true);
-      setStatusMsg('');
-      try {
-        const restored = JSON.parse(JSON.stringify(defaultData));
-        setFormData(restored);
-        await updateSiteData(restored);
-        setStatusMsg('✓ Website content successfully restored to original default data!');
-      } catch (err) {
-        setStatusMsg('❌ Error restoring default data: ' + err.message);
-      } finally {
-        setSaving(false);
-      }
-    }
-  };
+  if (loading || !formData) {
+    return (
+      <div className="min-h-screen bg-[#0c1d2e] flex flex-col items-center justify-center text-white space-y-4 font-sans">
+        <div className="w-12 h-12 border-4 border-[#04A552]/30 border-t-[#04A552] rounded-full animate-spin"></div>
+        <p className="text-sm font-semibold tracking-wide text-slate-300">
+          Initializing Inexserv Admin Studio...
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col font-sans">
-      {/* Top Admin Header Bar */}
-      <header className="bg-[#074476] text-white py-4 px-8 flex justify-between items-center shadow-lg sticky top-0 z-50">
-        <div className="flex items-center gap-4">
-          <img src="/images/inexserv-white.avif" alt="IES Logo" className="h-8 w-auto" />
-          <span className="text-xl font-bold border-l border-white/20 pl-4">Admin Content Manager (CMS)</span>
-          <span className={`text-xs px-3 py-1 rounded-full font-medium ${isUsingSupabase ? 'bg-emerald-500 text-white' : 'bg-amber-500 text-white'}`}>
-            {isUsingSupabase ? '● Live REST API & DB Mode' : '▲ Local Fallback Mode'}
-          </span>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={handleRestoreDefaultData}
-            disabled={saving}
-            className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2.5 rounded-lg font-medium shadow transition-all cursor-pointer text-xs flex items-center gap-1.5"
-            title="Recover all deleted cards and reset to original content"
-          >
-            🔄 Restore Original Default Data
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="bg-[#04A552] hover:bg-emerald-600 text-white px-5 py-2.5 rounded-lg font-medium shadow transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2 text-sm"
-          >
-            {saving ? 'Publishing...' : '💾 Save & Publish All Changes'}
-          </button>
-          <button
-            onClick={handleLogout}
-            className="bg-red-600/80 hover:bg-red-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer"
-          >
-            Logout
-          </button>
-        </div>
-      </header>
+    <div className="min-h-screen bg-slate-100 flex flex-col font-sans antialiased text-slate-800 selection:bg-[#04A552] selection:text-white">
+      {/* 1. Full-Width Top Navbar covering complete line with website branding */}
+      <AdminNavbar
+        activeTabLabel={activeCmsSectionMeta?.label || 'Website Content'}
+        activeSubLabel={null}
+        isUsingSupabase={isUsingSupabase}
+        isUsingBackend={isUsingBackend}
+        saving={saving}
+        onSave={handleSave}
+        onRestoreDefault={handleRestoreDefaults}
+        onOpenMobileMenu={() => setMobileMenuOpen(true)}
+      />
 
-      {/* Main CMS Workspace */}
-      <div className="flex-1 flex max-w-[1800px] w-full mx-auto p-6 gap-6">
-        {/* Left Sidebar Navigation */}
-        <aside className="w-64 bg-white rounded-xl shadow-md p-4 space-y-1.5 flex-shrink-0 h-fit sticky top-24">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 mb-3">Website Sections</p>
-          {[
-            { id: 'header', label: '🔝 Header & Navbar' },
-            { id: 'hero', label: '🚀 Hero & Partner Logos' },
-            { id: 'services', label: '💼 Services Cards' },
-            { id: 'solutions', label: '💡 Solutions (Founders/Enterprise)' },
-            { id: 'tech', label: '⚙️ Tech Stack Categories' },
-            { id: 'hire', label: '👨‍💻 Hire Developers' },
-            { id: 'cta', label: '📢 CTA Banner' },
-            { id: 'locations', label: '📍 Office Locations' },
-            { id: 'footer', label: '🦶 Footer & Contacts' },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`w-full text-left px-4 py-3 rounded-lg font-medium text-sm transition-all cursor-pointer ${
-                activeTab === tab.id
-                  ? 'bg-[#074476] text-white shadow'
-                  : 'text-gray-700 hover:bg-slate-100'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-          <div className="pt-4 border-t border-gray-100 mt-4 space-y-2">
-            <a href="/" target="_blank" rel="noreferrer" className="block text-center text-sm text-[#074476] font-semibold hover:underline">
-              🔗 View Live Website ↗
-            </a>
+      {/* 2. Body Area: 9 Website Sections Sidebar on left, Content Editor on right */}
+      <div className="flex-1 flex max-w-[1920px] w-full mx-auto p-4 gap-5">
+        {/* Desktop 9 Sections Sidebar UNDER Navbar */}
+        <div className="hidden lg:block sticky top-[4.75rem] h-[calc(100vh-5.75rem)] flex-shrink-0 z-40">
+          <AdminSidebar
+            activeCmsSection={activeCmsSection}
+            setActiveCmsSection={setActiveCmsSection}
+            collapsed={collapsed}
+            setCollapsed={setCollapsed}
+            onLogout={handleLogout}
+            cmsSections={cmsSections}
+          />
+        </div>
+
+        {/* Mobile Drawer Sidebar */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden fixed inset-0 z-50 flex">
+            <div
+              className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"
+              onClick={() => setMobileMenuOpen(false)}
+            ></div>
+            <div className="relative z-10 w-72 h-full bg-[#0c1d2e] p-3">
+              <AdminSidebar
+                activeCmsSection={activeCmsSection}
+                setActiveCmsSection={(sec) => {
+                  setActiveCmsSection(sec);
+                  setMobileMenuOpen(false);
+                }}
+                collapsed={false}
+                setCollapsed={() => {}}
+                onLogout={handleLogout}
+                cmsSections={cmsSections}
+              />
+            </div>
           </div>
-        </aside>
+        )}
 
-        {/* Right Content Editor Area */}
-        <main className="flex-1 bg-white rounded-xl shadow-md p-8 overflow-y-auto max-h-[85vh]">
-          {statusMsg && (
-            <div className={`p-4 mb-6 rounded-lg text-sm font-medium ${statusMsg.startsWith('✓') ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-red-50 text-red-800 border border-red-200'}`}>
-              {statusMsg}
-            </div>
-          )}
-
-          {/* 1. HEADER EDITOR */}
-          {activeTab === 'header' && (
-            <div className="space-y-6">
-              <h3 className="text-xl font-bold text-[#0f2b48] border-b pb-2">Header & Navigation Editor</h3>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Contact Button Text</label>
-                <input
-                  type="text"
-                  value={formData.header?.contactButtonText || ''}
-                  onChange={(e) => setFormData({ ...formData, header: { ...formData.header, contactButtonText: e.target.value } })}
-                  className="w-full p-3 border rounded-lg text-sm text-gray-800"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Mega Menu Title</label>
-                <input
-                  type="text"
-                  value={formData.header?.megaMenu?.title || ''}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    header: { ...formData.header, megaMenu: { ...formData.header.megaMenu, title: e.target.value } }
-                  })}
-                  className="w-full p-3 border rounded-lg text-sm text-gray-800"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Mega Menu Description</label>
-                <textarea
-                  rows={2}
-                  value={formData.header?.megaMenu?.description || ''}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    header: { ...formData.header, megaMenu: { ...formData.header.megaMenu, description: e.target.value } }
-                  })}
-                  className="w-full p-3 border rounded-lg text-sm text-gray-800"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* 2. HERO EDITOR */}
-          {activeTab === 'hero' && (
-            <div className="space-y-6">
-              <h3 className="text-xl font-bold text-[#0f2b48] border-b pb-2">Hero Section Editor</h3>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tagline Badge</label>
-                <input
-                  type="text"
-                  value={formData.hero?.tagline || ''}
-                  onChange={(e) => setFormData({ ...formData, hero: { ...formData.hero, tagline: e.target.value } })}
-                  className="w-full p-3 border rounded-lg text-sm text-gray-800"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Headline Line 1</label>
-                <input
-                  type="text"
-                  value={formData.hero?.titleLine1 || ''}
-                  onChange={(e) => setFormData({ ...formData, hero: { ...formData.hero, titleLine1: e.target.value } })}
-                  className="w-full p-3 border rounded-lg text-sm text-gray-800"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Headline Line 2</label>
-                <input
-                  type="text"
-                  value={formData.hero?.titleLine2 || ''}
-                  onChange={(e) => setFormData({ ...formData, hero: { ...formData.hero, titleLine2: e.target.value } })}
-                  className="w-full p-3 border rounded-lg text-sm text-gray-800"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description Paragraph</label>
-                <textarea
-                  rows={4}
-                  value={formData.hero?.description || ''}
-                  onChange={(e) => setFormData({ ...formData, hero: { ...formData.hero, description: e.target.value } })}
-                  className="w-full p-3 border rounded-lg text-sm text-gray-800"
-                />
-              </div>
-            </div>
-          )}
+        {/* Right Main Section Editor Workspace */}
+        <main className="flex-1 min-w-0">
+          <AdminContentEditor
+            activeSection={activeCmsSection}
+            formData={formData}
+            setFormData={setFormData}
+            cmsSections={cmsSections}
+          />
         </main>
       </div>
+
+      {/* Floating Toast Notification */}
+      {toast && (
+        <div
+          className={`fixed bottom-6 right-6 z-50 px-5 py-3.5 rounded-2xl shadow-2xl text-xs font-bold transition-all flex items-center gap-3 border ${
+            toast.type === 'success'
+              ? 'bg-[#0c1d2e] text-emerald-400 border-emerald-500/40 shadow-emerald-950/40'
+              : 'bg-red-900 text-white border-red-700 shadow-red-950/40'
+          }`}
+        >
+          <span>{toast.text}</span>
+          <button
+            onClick={() => setToast(null)}
+            className="text-slate-400 hover:text-white text-sm ml-2"
+          >
+            ✕
+          </button>
+        </div>
+      )}
     </div>
   );
 }

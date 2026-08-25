@@ -9,6 +9,8 @@ const leadsRouter = require('./routes/leads');
 const adminRouter = require('./routes/admin');
 const contentRouter = require('./routes/content');
 const authRouter = require('./routes/auth');
+const uploadRouter = require('./routes/upload');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -43,6 +45,9 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(morgan('dev'));
 
+// Static uploads serving
+app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
+
 // Health check endpoint
 app.get(['/health', '/api/health'], (req, res) => {
   res.status(200).json({
@@ -56,6 +61,7 @@ app.use(['/api/content', '/content'], contentRouter);
 app.use(['/api/auth', '/auth'], authRouter);
 app.use(['/api/leads', '/leads'], leadsRouter);
 app.use(['/api/admin', '/admin'], adminRouter);
+app.use(['/api/upload', '/upload'], uploadRouter);
 
 // Handle 404 Route Not Found
 app.use((req, res) => {

@@ -1,12 +1,31 @@
 {
   "header": {
     "navLinks": [
-      { "label": "About Us", "href": "/about-us" },
-      { "label": "Services", "href": "/services", "hasDropdown": true },
-      { "label": "Projects", "href": "/projects" },
-      { "label": "Industries", "href": "/industries" },
-      { "label": "Merchant Acquisition", "href": "/merchant-acquisition" },
-      { "label": "Insights", "href": "/insights" }
+      {
+        "label": "About Us",
+        "href": "/about-us"
+      },
+      {
+        "label": "Services",
+        "href": "/services",
+        "hasDropdown": true
+      },
+      {
+        "label": "Projects",
+        "href": "/projects"
+      },
+      {
+        "label": "Industries",
+        "href": "/industries"
+      },
+      {
+        "label": "Merchant Acquisition",
+        "href": "/merchant-acquisition"
+      },
+      {
+        "label": "Insights",
+        "href": "/insights"
+      }
     ],
     "megaMenu": {
       "title": "OUR SERVICES",
@@ -16,7 +35,7 @@
           "href": "/services/ai-development",
           "label": "AI Development",
           "desc": "Harness the power of AI to develop smart solutions that drive business efficiency & innovation.",
-          "img": "/images/servisec-manu/aidevelopment.svg"
+          "img": "https://srpgbmsbgqippemtpdyw.supabase.co/storage/v1/object/public/website-assets/uploads/webdevelopment-1787659379307.svg"
         },
         {
           "href": "/services/automation-tools",
@@ -52,27 +71,56 @@
     },
     "contactButtonText": "Contact Us"
   },
-
   "hero": {
     "tagline": "Transforming Ideas into Impactful Software",
     "titleLine1": "Innovate. Accelerate. Succeed.",
     "titleLine2": "Empowering Your Vision",
-    "keywords": ["AI", "Blockchain", "Web Apps", "Mobile Apps", "DevOps", "Automation"],
+    "keywords": [
+      "AI",
+      "Blockchain",
+      "Web Apps",
+      "Mobile Apps",
+      "DevOps",
+      "Automation"
+    ],
     "description": "IES is your trusted partner for custom software development services. We help forward-thinking businesses solve real-world problems with AI-powered tools, scalable SaaS platforms, mobile & web apps, and enterprise automation solutions. Let's build your next big thing—smarter, faster, and with measurable results.",
     "ctaLetstalk": "Let's Talk",
     "ctaLearnMore": "Learn More",
     "partnerLogos": [
-      { "name": "Bank of Muscat", "src": "/images/bank.png" },
-      { "name": "BMW Group", "src": "/images/bmwgroup.png" },
-      { "name": "Oracle", "src": "/images/oracle.png" },
-      { "name": "Raast", "src": "/images/raast.png" },
-      { "name": "PayPak", "src": "/images/paypak.png" },
-      { "name": "Ecobank", "src": "/images/ecobank.png" },
-      { "name": "Logo 1", "src": "/images/logo1.png" },
-      { "name": "Logo 3", "src": "/images/logo3.png" }
+      {
+        "name": "Bank of Muscat",
+        "src": "/images/bank.png"
+      },
+      {
+        "name": "BMW Group",
+        "src": "/images/bmwgroup.png"
+      },
+      {
+        "name": "Oracle",
+        "src": "/images/oracle.png"
+      },
+      {
+        "name": "Raast",
+        "src": "/images/raast.png"
+      },
+      {
+        "name": "PayPak",
+        "src": "/images/paypak.png"
+      },
+      {
+        "name": "Ecobank",
+        "src": "/images/ecobank.png"
+      },
+      {
+        "name": "Logo 1",
+        "src": "/images/logo1.png"
+      },
+      {
+        "name": "Logo 3",
+        "src": "/images/logo3.png"
+      }
     ]
   },
-
   "servicesSection": {
     "title": "Services",
     "subtitle": "We specialize in developing corporate and consumer applications, driven by our deep expertise in cutting-edge technologies.",
@@ -80,8 +128,9 @@
       {
         "title": "Application Development",
         "href": "/services/application-development",
-        "img": "/images/webdevelopment.svg",
-        "desc": "We create scalable SaaS web applications using React, Next.js, Node.js, Vue.js, and Nuxt. Partner with a full-stack development company that delivers results for US businesses."
+        "img": "https://srpgbmsbgqippemtpdyw.supabase.co/storage/v1/object/public/website-assets/uploads/webdevelopment-1787659370436.svg",
+        "desc": "We create scalable SaaS web applications using React, Next.js, Node.js, Vue.js, and Nuxt. Partner with a full-stack development company that delivers results for US businesses.",
+        "icon": "https://srpgbmsbgqippemtpdyw.supabase.co/storage/v1/object/public/website-assets/uploads/webdevelopment-1787659370436.svg"
       },
       {
         "title": "Mobile App Development",
@@ -115,7 +164,6 @@
       }
     ]
   },
-
   "solutionsSection": {
     "title": "Solutions That Fit Your Stage",
     "subtitle": "Whether you're building your first MVP, scaling operations, or fixing a failing product — we're here to help you win.",
@@ -143,7 +191,6 @@
       }
     ]
   },
-
   "techStackSection": {
     "titlePrefix": "Forward-Thinking Software ",
     "titleHighlight": "Development Services",
@@ -319,14 +366,12 @@
       }
     ]
   },
-
   "ctaBanner": {
     "titleLine1": "Let's Build Something",
     "titleLine2": "Great Together",
     "paragraph": "Partner with IES to transform your ideas into powerful digital solutions that drive real business results.",
     "buttonText": "Get Started"
   },
-
   "hireDevSection": {
     "titlePart1": "Hire Developers and ",
     "titlePart2": "Build Your Team",
@@ -337,98 +382,250 @@
         "id": "frontend",
         "name": "Front-End",
         "techs": [
-          { "name": "HTML", "logo": "/images/tech-stack-images/html.svg" },
-          { "name": "CSS", "logo": "/images/tech-stack-images/css.svg" },
-          { "name": "Javascript", "logo": "/images/tech-stack-images/js.svg" },
-          { "name": "SaaS", "logo": "/images/tech-stack-images/saas.svg" },
-          { "name": "React JS", "logo": "/images/tech-stack-images/react.svg" },
-          { "name": "Vue JS", "logo": "/images/tech-stack-images/vue.svg" },
-          { "name": "Angular", "logo": "/images/tech-stack-images/angular.svg" },
-          { "name": "Meteor JS", "logo": "/images/tech-stack-images/meteor.svg" },
-          { "name": "Nuxt JS", "logo": "/images/tech-stack-images/nuxt.svg" },
-          { "name": "WebGL", "logo": "/images/tech-stack-images/webgl.svg" }
+          {
+            "name": "HTML",
+            "logo": "/images/tech-stack-images/html.svg"
+          },
+          {
+            "name": "CSS",
+            "logo": "/images/tech-stack-images/css.svg"
+          },
+          {
+            "name": "Javascript",
+            "logo": "/images/tech-stack-images/js.svg"
+          },
+          {
+            "name": "SaaS",
+            "logo": "/images/tech-stack-images/saas.svg"
+          },
+          {
+            "name": "React JS",
+            "logo": "/images/tech-stack-images/react.svg"
+          },
+          {
+            "name": "Vue JS",
+            "logo": "/images/tech-stack-images/vue.svg"
+          },
+          {
+            "name": "Angular",
+            "logo": "/images/tech-stack-images/angular.svg"
+          },
+          {
+            "name": "Meteor JS",
+            "logo": "/images/tech-stack-images/meteor.svg"
+          },
+          {
+            "name": "Nuxt JS",
+            "logo": "/images/tech-stack-images/nuxt.svg"
+          },
+          {
+            "name": "WebGL",
+            "logo": "/images/tech-stack-images/webgl.svg"
+          }
         ]
       },
       {
         "id": "backend",
         "name": "Back-End",
         "techs": [
-          { "name": "Node-js", "logo": "/images/tech-stack-images/Node-js.svg" },
-          { "name": "Golang", "logo": "/images/tech-stack-images/go.svg" },
-          { "name": "C#", "logo": "/images/tech-stack-images/c.svg" },
-          { "name": "Nest-js", "logo": "/images/tech-stack-images/tt.svg" }
+          {
+            "name": "Node-js",
+            "logo": "/images/tech-stack-images/Node-js.svg"
+          },
+          {
+            "name": "Golang",
+            "logo": "/images/tech-stack-images/go.svg"
+          },
+          {
+            "name": "C#",
+            "logo": "/images/tech-stack-images/c.svg"
+          },
+          {
+            "name": "Nest-js",
+            "logo": "/images/tech-stack-images/tt.svg"
+          }
         ]
       },
       {
         "id": "lownocode",
         "name": "Low/No Code",
         "techs": [
-          { "name": "Shopify", "logo": "/images/tech-stack-images/Shopify.jpg" },
-          { "name": "Wordpress", "logo": "/images/tech-stack-images/Wordpress.png" },
-          { "name": "Zoho", "logo": "/images/tech-stack-images/zoho.svg" },
-          { "name": "Zapier", "logo": "/images/tech-stack-images/Zapier.png" },
-          { "name": "Wix", "logo": "/images/tech-stack-images/wix.png" },
-          { "name": "HubSpot", "logo": "/images/tech-stack-images/hubspot.svg" },
-          { "name": "GHL", "logo": "/images/tech-stack-images/GHL.jpg" }
+          {
+            "name": "Shopify",
+            "logo": "/images/tech-stack-images/Shopify.jpg"
+          },
+          {
+            "name": "Wordpress",
+            "logo": "/images/tech-stack-images/Wordpress.png"
+          },
+          {
+            "name": "Zoho",
+            "logo": "/images/tech-stack-images/zoho.svg"
+          },
+          {
+            "name": "Zapier",
+            "logo": "/images/tech-stack-images/Zapier.png"
+          },
+          {
+            "name": "Wix",
+            "logo": "/images/tech-stack-images/wix.png"
+          },
+          {
+            "name": "HubSpot",
+            "logo": "/images/tech-stack-images/hubspot.svg"
+          },
+          {
+            "name": "GHL",
+            "logo": "/images/tech-stack-images/GHL.jpg"
+          }
         ]
       },
       {
         "id": "database",
         "name": "Database",
         "techs": [
-          { "name": "Firebase", "logo": "/images/tech-stack-images/Firebase.svg" },
-          { "name": "Mongodb", "logo": "/images/tech-stack-images/Mongodb.svg" },
-          { "name": "Postgresql", "logo": "/images/tech-stack-images/Postgresql.svg" },
-          { "name": "Sqlite", "logo": "/images/tech-stack-images/Sqlite.svg" },
-          { "name": "Ms-sql", "logo": "/images/tech-stack-images/Ms-sql.svg" },
-          { "name": "Aws-dynamodb", "logo": "/images/tech-stack-images/Aws-dynamodb.svg" },
-          { "name": "Mysql", "logo": "/images/tech-stack-images/Mysql.svg" },
-          { "name": "Redis", "logo": "/images/tech-stack-images/Redis.svg" }
+          {
+            "name": "Firebase",
+            "logo": "/images/tech-stack-images/Firebase.svg"
+          },
+          {
+            "name": "Mongodb",
+            "logo": "/images/tech-stack-images/Mongodb.svg"
+          },
+          {
+            "name": "Postgresql",
+            "logo": "/images/tech-stack-images/Postgresql.svg"
+          },
+          {
+            "name": "Sqlite",
+            "logo": "/images/tech-stack-images/Sqlite.svg"
+          },
+          {
+            "name": "Ms-sql",
+            "logo": "/images/tech-stack-images/Ms-sql.svg"
+          },
+          {
+            "name": "Aws-dynamodb",
+            "logo": "/images/tech-stack-images/Aws-dynamodb.svg"
+          },
+          {
+            "name": "Mysql",
+            "logo": "/images/tech-stack-images/Mysql.svg"
+          },
+          {
+            "name": "Redis",
+            "logo": "/images/tech-stack-images/Redis.svg"
+          }
         ]
       },
       {
         "id": "devops",
         "name": "DevOps",
         "techs": [
-          { "name": "Aws", "logo": "/images/tech-stack-images/awss.svg" },
-          { "name": "Jenkins", "logo": "/images/tech-stack-images/jenkins.svg" },
-          { "name": "Docker", "logo": "/images/tech-stack-images/docker.svg" }
+          {
+            "name": "Aws",
+            "logo": "/images/tech-stack-images/awss.svg"
+          },
+          {
+            "name": "Jenkins",
+            "logo": "/images/tech-stack-images/jenkins.svg"
+          },
+          {
+            "name": "Docker",
+            "logo": "/images/tech-stack-images/docker.svg"
+          }
         ]
       },
       {
         "id": "mobile",
         "name": "Mobile",
         "techs": [
-          { "name": "React Native", "logo": "/images/tech-stack-images/reactnative.svg" },
-          { "name": "Flutter", "logo": "/images/tech-stack-images/flutter.svg" }
+          {
+            "name": "React Native",
+            "logo": "/images/tech-stack-images/reactnative.svg"
+          },
+          {
+            "name": "Flutter",
+            "logo": "/images/tech-stack-images/flutter.svg"
+          }
         ]
       },
       {
         "id": "aiml",
         "name": "AI & ML",
         "techs": [
-          { "name": "Tensorflow", "logo": "/images/tech-stack-images/Tensorflow.svg" },
-          { "name": "Keras", "logo": "/images/tech-stack-images/Keras.svg" },
-          { "name": "Pytorch", "logo": "/images/tech-stack-images/Pytorch.svg" },
-          { "name": "Lisp", "logo": "/images/tech-stack-images/Lisp.svg" },
-          { "name": "NTKL", "logo": "/images/tech-stack-images/NTKL.svg" },
-          { "name": "Spacy", "logo": "/images/tech-stack-images/Spacy.svg" },
-          { "name": "Open-ai", "logo": "/images/tech-stack-images/Open-ai.svg" },
-          { "name": "Plotly", "logo": "/images/tech-stack-images/Plotly.svg" },
-          { "name": "Matplotlib", "logo": "/images/tech-stack-images/Matplotlib.svg" },
-          { "name": "Pandas", "logo": "/images/tech-stack-images/Pandas.svg" },
-          { "name": "Opencv", "logo": "/images/tech-stack-images/Opencv.svg" },
-          { "name": "Numpy", "logo": "/images/tech-stack-images/Numpy.svg" },
-          { "name": "Scikit_learn", "logo": "/images/tech-stack-images/Scikit_learn.svg" },
-          { "name": "Mistral", "logo": "/images/tech-stack-images/Mistral.svg" },
-          { "name": "DeepSeek", "logo": "/images/tech-stack-images/DeepSeek.svg" },
-          { "name": "llamas", "logo": "/images/tech-stack-images/llamas.svg" },
-          { "name": "Langflow", "logo": "/images/tech-stack-images/Langflow.svg" }
+          {
+            "name": "Tensorflow",
+            "logo": "/images/tech-stack-images/Tensorflow.svg"
+          },
+          {
+            "name": "Keras",
+            "logo": "/images/tech-stack-images/Keras.svg"
+          },
+          {
+            "name": "Pytorch",
+            "logo": "/images/tech-stack-images/Pytorch.svg"
+          },
+          {
+            "name": "Lisp",
+            "logo": "/images/tech-stack-images/Lisp.svg"
+          },
+          {
+            "name": "NTKL",
+            "logo": "/images/tech-stack-images/NTKL.svg"
+          },
+          {
+            "name": "Spacy",
+            "logo": "/images/tech-stack-images/Spacy.svg"
+          },
+          {
+            "name": "Open-ai",
+            "logo": "/images/tech-stack-images/Open-ai.svg"
+          },
+          {
+            "name": "Plotly",
+            "logo": "/images/tech-stack-images/Plotly.svg"
+          },
+          {
+            "name": "Matplotlib",
+            "logo": "/images/tech-stack-images/Matplotlib.svg"
+          },
+          {
+            "name": "Pandas",
+            "logo": "/images/tech-stack-images/Pandas.svg"
+          },
+          {
+            "name": "Opencv",
+            "logo": "/images/tech-stack-images/Opencv.svg"
+          },
+          {
+            "name": "Numpy",
+            "logo": "/images/tech-stack-images/Numpy.svg"
+          },
+          {
+            "name": "Scikit_learn",
+            "logo": "/images/tech-stack-images/Scikit_learn.svg"
+          },
+          {
+            "name": "Mistral",
+            "logo": "/images/tech-stack-images/Mistral.svg"
+          },
+          {
+            "name": "DeepSeek",
+            "logo": "/images/tech-stack-images/DeepSeek.svg"
+          },
+          {
+            "name": "llamas",
+            "logo": "/images/tech-stack-images/llamas.svg"
+          },
+          {
+            "name": "Langflow",
+            "logo": "/images/tech-stack-images/Langflow.svg"
+          }
         ]
       }
     ]
   },
-
   "officeLocations": [
     {
       "country": "USA",
@@ -449,7 +646,6 @@
       "phone": "+968 9577 3070"
     }
   ],
-
   "footer": {
     "consultationTitle": "Let's talk about your project",
     "consultationDesc": "Have a project in mind? Talk to us directly and get personalized guidance every step of the way.",
@@ -458,38 +654,101 @@
     "strategicConsultingParagraph": "IES LLC is practicing global strategic consulting for over 10+ years, we partner with leaders from business and society to overcome the greatest challenges and capture their greatest opportunities. Our success depends on our ability to collaborate deeply and on our ability to work across cultures to improve ourselves and the world.",
     "letsTalkButtonText": "Let's Talk",
     "servicesLinks": [
-      { "label": "Application Development", "href": "/services/application-development" },
-      { "label": "Mobile Development", "href": "/services/mobile-development" },
-      { "label": "AI Development", "href": "/services/ai-development" },
-      { "label": "Blockchain Development", "href": "/services/blockchain-development" },
-      { "label": "Desktop Development", "href": "/services/desktop-software" },
-      { "label": "Automation Tools", "href": "/services/automation-tools" }
+      {
+        "label": "Application Development",
+        "href": "/services/application-development"
+      },
+      {
+        "label": "Mobile Development",
+        "href": "/services/mobile-development"
+      },
+      {
+        "label": "AI Development",
+        "href": "/services/ai-development"
+      },
+      {
+        "label": "Blockchain Development",
+        "href": "/services/blockchain-development"
+      },
+      {
+        "label": "Desktop Development",
+        "href": "/services/desktop-software"
+      },
+      {
+        "label": "Automation Tools",
+        "href": "/services/automation-tools"
+      }
     ],
     "quickLinks": [
-      { "label": "About Us", "href": "/about-us" },
-      { "label": "Services", "href": "/services" },
-      { "label": "Projects", "href": "/projects" },
-      { "label": "Merchant Acquisition", "href": "/merchant-acquisition" },
-      { "label": "Insights", "href": "/insights" },
-      { "label": "Contact Us", "href": "/contact-us" }
+      {
+        "label": "About Us",
+        "href": "/about-us"
+      },
+      {
+        "label": "Services",
+        "href": "/services"
+      },
+      {
+        "label": "Projects",
+        "href": "/projects"
+      },
+      {
+        "label": "Merchant Acquisition",
+        "href": "/merchant-acquisition"
+      },
+      {
+        "label": "Insights",
+        "href": "/insights"
+      },
+      {
+        "label": "Contact Us",
+        "href": "/contact-us"
+      }
     ],
     "contactInfo": {
       "address": "P.O.Box 128, Al Qurum, Postal Code 102, Sultanate of Oman.",
-      "emails": ["Info@inexserv.com", "management@inexserv.com"],
+      "emails": [
+        "Info@inexserv.com",
+        "management@inexserv.com"
+      ],
       "phone": "+968 9577 3070"
     },
     "socialLinks": [
-      { "platform": "facebook", "url": "https://www.facebook.com" },
-      { "platform": "twitter", "url": "https://twitter.com" },
-      { "platform": "linkedin", "url": "https://www.linkedin.com" },
-      { "platform": "instagram", "url": "https://instagram.com" }
+      {
+        "platform": "facebook",
+        "url": "https://www.facebook.com"
+      },
+      {
+        "platform": "twitter",
+        "url": "https://twitter.com"
+      },
+      {
+        "platform": "linkedin",
+        "url": "https://www.linkedin.com"
+      },
+      {
+        "platform": "instagram",
+        "url": "https://instagram.com"
+      }
     ],
     "copyright": "© 2026 All Rights Reserved to Integrated Excellence Services LLC",
     "policyLinks": [
-      { "label": "Sitemap", "href": "/sitemap" },
-      { "label": "Privacy Policy", "href": "/privacy-policy" },
-      { "label": "IMS Policy", "href": "/ims-policy" },
-      { "label": "Terms & Conditions", "href": "/terms-and-conditions" }
+      {
+        "label": "Sitemap",
+        "href": "/sitemap"
+      },
+      {
+        "label": "Privacy Policy",
+        "href": "/privacy-policy"
+      },
+      {
+        "label": "IMS Policy",
+        "href": "/ims-policy"
+      },
+      {
+        "label": "Terms & Conditions",
+        "href": "/terms-and-conditions"
+      }
     ]
   }
 }

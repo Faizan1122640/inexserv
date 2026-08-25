@@ -18,19 +18,23 @@ try {
 const app = express();
 
 // Initialize Supabase Client safely using environment variables
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || '';
+const supabaseUrl = process.env.SUPABASE_URL || 'https://srpgbmsbgqippemtpdyw.supabase.co';
+const supabaseKey =
+  process.env.SUPABASE_SECRET_KEY ||
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  process.env.SUPABASE_ANON_KEY ||
+  process.env.SUPABASE_PUBLISHABLE_KEY;
 
 let supabase = null;
-if (supabaseUrl && supabaseAnonKey) {
+if (supabaseUrl && supabaseKey) {
   try {
-    supabase = createClient(supabaseUrl, supabaseAnonKey);
+    supabase = createClient(supabaseUrl, supabaseKey);
   } catch (err) {
     console.warn('Supabase client creation notice:', err.message);
   }
 }
 
-// CORS configuration using environment variables
+// CORS configuration
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
   : ['http://localhost:5173', 'https://inexserv.vercel.app'];
@@ -52,7 +56,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Health Check
 app.get(['/api/health', '/health'], (req, res) => {
-  res.status(200).json({ success: true, message: 'Serverless API is healthy' });
+  res.status(200).json({ success: true, message: 'Serverless API is healthy', timestamp: new Date().toISOString() });
 });
 
 // GET Content Route
@@ -109,7 +113,75 @@ app.put(['/api/content', '/content'], async (req, res) => {
   });
 });
 
-// POST Auth Login Route - Environment Secret Verified
+// POST Upload Route - Direct to Supabase Storage Bucket ('website-assets')
+app.post(['/api/upload', '/upload'], async (req, res) => {
+  try {
+    const { fileBase64, fileName, fileType, bucket = 'website-assets' } = req.body || {};
+
+    if (!fileBase64) {
+      return res.status(400).json({
+        success: false,
+        error: 'No image payload provided (fileBase64 is required).'
+      });
+    }
+
+    const matches = fileBase64.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+    const mimeType = matches ? matches[1] : (fileType || 'image/png');
+    const base64Data = matches ? matches[2] : fileBase64;
+    const buffer = Buffer.from(base64Data, 'base64');
+
+    const ext = fileName ? fileName.split('.').pop() || 'png' : 'png';
+    const cleanBaseName = (fileName || 'asset')
+      .replace(`.${ext}`, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]/g, '-');
+    const uniqueFileName = `${cleanBaseName}-${Date.now()}.${ext}`;
+    const filePath = `uploads/${uniqueFileName}`;
+
+    if (supabase && supabase.storage) {
+      const { data, error } = await supabase.storage
+        .from(bucket)
+        .upload(filePath, buffer, {
+          contentType: mimeType,
+          upsert: true
+        });
+
+      if (!error && data) {
+        const { data: publicUrlData } = supabase.storage
+          .from(bucket)
+          .getPublicUrl(filePath);
+
+        if (publicUrlData && publicUrlData.publicUrl) {
+          return res.status(200).json({
+            success: true,
+            source: 'supabase-storage',
+            bucket,
+            path: data.path,
+            publicUrl: publicUrlData.publicUrl,
+            fileName: uniqueFileName,
+            size: buffer.length,
+            mimeType
+          });
+        }
+      } else if (error) {
+        console.warn('Supabase storage upload error:', error.message);
+      }
+    }
+
+    return res.status(500).json({
+      success: false,
+      error: 'Supabase storage service unavailable. Please check credentials.'
+    });
+  } catch (uploadErr) {
+    console.error('Serverless upload error:', uploadErr);
+    return res.status(500).json({
+      success: false,
+      error: uploadErr.message || 'Upload failed'
+    });
+  }
+});
+
+// POST Auth Login Route
 app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
   const { email, password } = req.body || {};
 
@@ -123,13 +195,11 @@ app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
   const cleanEmail = email.trim().toLowerCase();
   const cleanPass = password.trim();
 
-  // Read environment variable credentials
   const adminEmail = (process.env.ADMIN_EMAIL || 'admin@gmail.com').toLowerCase();
   const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
   const altEmail = (process.env.ADMIN_ALT_EMAIL || 'admin@inexserv.com').toLowerCase();
   const altPassword = process.env.ADMIN_ALT_PASSWORD || 'admin@123';
 
-  // 1. Secret Environment Admin Check
   if (
     (cleanEmail === adminEmail && cleanPass === adminPassword) ||
     (cleanEmail === altEmail && cleanPass === altPassword)
@@ -143,7 +213,6 @@ app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
     });
   }
 
-  // 2. Supabase Auth Verification
   if (supabase) {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -165,18 +234,9 @@ app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
     }
   }
 
-  // 3. Reject Invalid Credentials (401 Access Denied)
   return res.status(401).json({
     success: false,
     error: 'Invalid email or password. Access Denied.'
-  });
-});
-
-// Fallback for all other API endpoints
-app.use((req, res) => {
-  res.status(200).json({
-    success: true,
-    data: defaultData
   });
 });
 
