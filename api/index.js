@@ -59,24 +59,49 @@ app.get(['/api/health', '/health'], (req, res) => {
   res.status(200).json({ success: true, message: 'Serverless API is healthy', timestamp: new Date().toISOString() });
 });
 
-// GET Content Route
+// In-memory cache for warm lambda reuse
+let cachedContent = null;
+let lastFetchTime = 0;
+const CACHE_TTL_MS = 60 * 1000; // 1 minute memory cache
+
+// GET Content Route - Blazing Fast with Edge & In-Memory Caching
 app.get(['/api/content', '/content'], async (req, res) => {
-  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-  let responseData = defaultData;
+  // Edge cache for 10 seconds, stale-while-revalidate up to 1 day for sub-50ms responses
+  res.setHeader('Cache-Control', 's-maxage=10, stale-while-revalidate=86400');
+
+  const now = Date.now();
+  if (cachedContent && now - lastFetchTime < CACHE_TTL_MS) {
+    return res.status(200).json({
+      success: true,
+      cached: true,
+      data: cachedContent
+    });
+  }
+
+  let responseData = cachedContent || defaultData;
 
   try {
     if (supabase) {
-      const { data, error } = await supabase
+      // 1.5s race timeout so response is never stalled
+      const fetchPromise = supabase
         .from('site_content')
         .select('data')
         .eq('id', 'main')
         .single();
 
-      if (!error && data && data.data && typeof data.data === 'object') {
+      const timeoutPromise = new Promise((resolve) =>
+        setTimeout(() => resolve({ timeout: true }), 1500)
+      );
+
+      const result = await Promise.race([fetchPromise, timeoutPromise]);
+
+      if (result && !result.timeout && !result.error && result.data && result.data.data) {
         responseData = {
           ...defaultData,
-          ...data.data
+          ...result.data.data
         };
+        cachedContent = responseData;
+        lastFetchTime = Date.now();
       }
     }
   } catch (err) {
@@ -92,6 +117,8 @@ app.get(['/api/content', '/content'], async (req, res) => {
 // PUT Content Route
 app.put(['/api/content', '/content'], async (req, res) => {
   const newContent = req.body || {};
+  cachedContent = { ...defaultData, ...newContent };
+  lastFetchTime = Date.now();
 
   try {
     if (supabase) {
