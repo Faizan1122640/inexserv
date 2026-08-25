@@ -122,16 +122,31 @@ app.put(['/api/content', '/content'], async (req, res) => {
 
   try {
     if (supabase) {
-      await supabase
+      const { data, error } = await supabase
         .from('site_content')
         .upsert({
           id: 'main',
           data: newContent,
           updated_at: new Date().toISOString()
         });
+
+      if (error) {
+        console.error('❌ Supabase upsert error:', error.message);
+        return res.status(500).json({
+          success: false,
+          error: `Database write failed: ${error.message}`
+        });
+      }
+      console.log('✅ Supabase site_content updated successfully');
+    } else {
+      console.warn('⚠️ Supabase client not initialized in PUT /api/content');
     }
   } catch (err) {
-    console.warn('Supabase update notice:', err.message);
+    console.error('❌ Supabase update exception:', err.message);
+    return res.status(500).json({
+      success: false,
+      error: `Server update error: ${err.message}`
+    });
   }
 
   return res.status(200).json({
