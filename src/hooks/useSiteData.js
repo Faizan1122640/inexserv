@@ -18,7 +18,7 @@ async function fetchSiteDataOnce() {
   inFlightFetchPromise = (async () => {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000);
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
 
       const res = await fetch(`${API_BASE_URL}/api/content`, {
         signal: controller.signal
