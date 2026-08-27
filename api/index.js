@@ -225,7 +225,7 @@ app.post(['/api/upload', '/upload'], async (req, res) => {
   }
 });
 
-// POST Auth Login Route
+// POST Auth Login Route - Direct Supabase Auth Verification (No hardcoded credentials)
 app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
   const { email, password } = req.body || {};
 
@@ -239,49 +239,45 @@ app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
   const cleanEmail = email.trim().toLowerCase();
   const cleanPass = password.trim();
 
-  const adminEmail = (process.env.ADMIN_EMAIL || 'admin@gmail.com').toLowerCase();
-  const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
-  const altEmail = (process.env.ADMIN_ALT_EMAIL || 'admin@inexserv.com').toLowerCase();
-  const altPassword = process.env.ADMIN_ALT_PASSWORD || 'admin@123';
-
-  if (
-    (cleanEmail === adminEmail && cleanPass === adminPassword) ||
-    (cleanEmail === altEmail && cleanPass === altPassword)
-  ) {
-    return res.status(200).json({
-      success: true,
-      data: {
-        token: process.env.JWT_SECRET || 'express-admin-session-token-12345',
-        user: { email: cleanEmail, role: 'admin' }
-      }
+  if (!supabase) {
+    return res.status(500).json({
+      success: false,
+      error: 'Authentication service is currently unavailable.'
     });
   }
 
-  if (supabase) {
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: cleanEmail,
-        password: cleanPass
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: cleanEmail,
+      password: cleanPass
+    });
+
+    if (error || !data || !data.session) {
+      return res.status(401).json({
+        success: false,
+        error: error ? error.message : 'Invalid email or password. Access Denied.'
       });
-
-      if (!error && data && data.session) {
-        return res.status(200).json({
-          success: true,
-          data: {
-            token: data.session.access_token,
-            user: data.user
-          }
-        });
-      }
-    } catch (sbErr) {
-      console.warn('Supabase auth notice:', sbErr.message);
     }
-  }
 
-  return res.status(401).json({
-    success: false,
-    error: 'Invalid email or password. Access Denied.'
-  });
+    return res.status(200).json({
+      success: true,
+      data: {
+        token: data.session.access_token,
+        user: {
+          id: data.user.id,
+          email: data.user.email,
+          role: data.user.role || 'admin',
+          user_metadata: data.user.user_metadata
+        }
+      }
+    });
+  } catch (sbErr) {
+    console.error('Supabase auth exception:', sbErr);
+    return res.status(500).json({
+      success: false,
+      error: 'Authentication failed. Please try again.'
+    });
+  }
 });
 
 export default app;

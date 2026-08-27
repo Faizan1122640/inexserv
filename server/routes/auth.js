@@ -3,7 +3,7 @@ const supabase = require('../config/supabaseClient');
 
 const router = express.Router();
 
-// POST /api/auth/login - Admin Login endpoint
+// POST /api/auth/login - Direct Supabase Auth Verification (No hardcoded credentials)
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body || {};
@@ -18,53 +18,43 @@ router.post('/login', async (req, res) => {
     const cleanEmail = email.trim().toLowerCase();
     const cleanPass = password.trim();
 
-    // Read secret credentials from process.env
-    const adminEmail = (process.env.ADMIN_EMAIL || 'admin@gmail.com').toLowerCase();
-    const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
-    const altEmail = (process.env.ADMIN_ALT_EMAIL || 'admin@inexserv.com').toLowerCase();
-    const altPassword = process.env.ADMIN_ALT_PASSWORD || 'admin@123';
+    if (!supabase) {
+      return res.status(500).json({
+        success: false,
+        error: 'Supabase authentication service unavailable'
+      });
+    }
 
-    // 1. Secret Environment Admin Check
-    if (
-      (cleanEmail === adminEmail && cleanPass === adminPassword) ||
-      (cleanEmail === altEmail && cleanPass === altPassword)
-    ) {
-      return res.status(200).json({
-        success: true,
-        data: {
-          token: process.env.JWT_SECRET || 'express-admin-session-token-12345',
-          user: { email: cleanEmail, role: 'admin' }
+    // Direct Supabase Auth verification
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: cleanEmail,
+      password: cleanPass
+    });
+
+    if (error || !data || !data.session) {
+      return res.status(401).json({
+        success: false,
+        error: error ? error.message : 'Invalid email or password. Access Denied.'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        token: data.session.access_token,
+        user: {
+          id: data.user.id,
+          email: data.user.email,
+          role: data.user.role || 'admin',
+          user_metadata: data.user.user_metadata
         }
-      });
-    }
-
-    // 2. Supabase Auth verification
-    if (supabase) {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: cleanEmail,
-        password: cleanPass
-      });
-
-      if (!error && data && data.session) {
-        return res.status(200).json({
-          success: true,
-          data: {
-            token: data.session.access_token,
-            user: data.user
-          }
-        });
       }
-    }
-
-    // 3. Reject Invalid Credentials
-    return res.status(401).json({
-      success: false,
-      error: 'Invalid email or password. Access Denied.'
     });
   } catch (err) {
+    console.error('Login error:', err);
     return res.status(401).json({
       success: false,
-      error: 'Invalid email or password. Access Denied.'
+      error: 'Authentication failed. Please check your credentials.'
     });
   }
 });
