@@ -10,7 +10,9 @@ let currentData = defaultData;
 
 // GET /api/content - Fetch website dynamic content with 100% fail-safe guarantees
 router.get('/', async (req, res) => {
-  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
 
   let responseData = currentData;
   let storage = 'local-file';

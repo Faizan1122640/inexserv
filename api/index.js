@@ -59,30 +59,19 @@ app.get(['/api/health', '/health'], (req, res) => {
   res.status(200).json({ success: true, message: 'Serverless API is healthy', timestamp: new Date().toISOString() });
 });
 
-// In-memory cache for warm lambda reuse
-let cachedContent = null;
-let lastFetchTime = 0;
-const CACHE_TTL_MS = 60 * 1000; // 1 minute memory cache
-
-// GET Content Route - Blazing Fast with Edge & In-Memory Caching
+// GET Content Route - Real-time with zero caching
 app.get(['/api/content', '/content'], async (req, res) => {
-  // Edge cache for 10 seconds, stale-while-revalidate up to 1 day for sub-50ms responses
-  res.setHeader('Cache-Control', 's-maxage=10, stale-while-revalidate=86400');
+  // Prevent any Edge or Browser caching
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
 
-  const now = Date.now();
-  if (cachedContent && now - lastFetchTime < CACHE_TTL_MS) {
-    return res.status(200).json({
-      success: true,
-      cached: true,
-      data: cachedContent
-    });
-  }
-
-  let responseData = cachedContent || defaultData;
+  let responseData = defaultData;
+  let storage = 'fallback';
 
   try {
     if (supabase) {
-      // 1.5s race timeout so response is never stalled
+      // 8s timeout to avoid any premature fallback on initial cold starts
       const fetchPromise = supabase
         .from('site_content')
         .select('data')
@@ -90,18 +79,19 @@ app.get(['/api/content', '/content'], async (req, res) => {
         .single();
 
       const timeoutPromise = new Promise((resolve) =>
-        setTimeout(() => resolve({ timeout: true }), 1500)
+        setTimeout(() => resolve({ timeout: true }), 8000)
       );
 
       const result = await Promise.race([fetchPromise, timeoutPromise]);
 
-      if (result && !result.timeout && !result.error && result.data && result.data.data) {
+      if (result && !result.timeout && !result.error && result.data && result.data.data && typeof result.data.data === 'object') {
         responseData = {
           ...defaultData,
           ...result.data.data
         };
-        cachedContent = responseData;
-        lastFetchTime = Date.now();
+        storage = 'supabase';
+      } else if (result?.error) {
+        console.warn('Supabase fetch query notice:', result.error.message);
       }
     }
   } catch (err) {
@@ -110,15 +100,18 @@ app.get(['/api/content', '/content'], async (req, res) => {
 
   return res.status(200).json({
     success: true,
-    data: responseData
+    data: responseData,
+    storage
   });
 });
 
 // PUT Content Route
 app.put(['/api/content', '/content'], async (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
   const newContent = req.body || {};
-  cachedContent = { ...defaultData, ...newContent };
-  lastFetchTime = Date.now();
 
   try {
     if (supabase) {
@@ -128,7 +121,8 @@ app.put(['/api/content', '/content'], async (req, res) => {
           id: 'main',
           data: newContent,
           updated_at: new Date().toISOString()
-        });
+        })
+        .select();
 
       if (error) {
         console.error('❌ Supabase upsert error:', error.message);
@@ -138,6 +132,13 @@ app.put(['/api/content', '/content'], async (req, res) => {
         });
       }
       console.log('✅ Supabase site_content updated successfully');
+
+      const savedData = data && data[0] && data[0].data ? data[0].data : newContent;
+      return res.status(200).json({
+        success: true,
+        data: savedData,
+        storage: 'supabase'
+      });
     } else {
       console.warn('⚠️ Supabase client not initialized in PUT /api/content');
     }
@@ -151,7 +152,8 @@ app.put(['/api/content', '/content'], async (req, res) => {
 
   return res.status(200).json({
     success: true,
-    data: newContent
+    data: newContent,
+    storage: 'fallback'
   });
 });
 

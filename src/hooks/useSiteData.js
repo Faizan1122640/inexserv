@@ -20,7 +20,14 @@ async function fetchSiteDataOnce() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-      const res = await fetch(`${API_BASE_URL}/api/content`, {
+      // Unique timestamp query param + cache: 'no-store' ensures browser & CDN never serve stale data
+      const url = `${API_BASE_URL}/api/content?_t=${Date.now()}`;
+      const res = await fetch(url, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        },
         signal: controller.signal
       });
 
@@ -41,7 +48,7 @@ async function fetchSiteDataOnce() {
         }
       }
     } catch (err) {
-      console.warn('Express Backend API fetch notice: using local fallback', err.message);
+      console.warn('Backend API fetch notice: using fallback', err.message);
     } finally {
       inFlightFetchPromise = null;
     }
@@ -99,19 +106,24 @@ export function useSiteData() {
     };
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/content`, {
+      const res = await fetch(`${API_BASE_URL}/api/content?_t=${Date.now()}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        },
         body: JSON.stringify(newData)
       });
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json.error || 'Failed to update content via Express API');
+        throw new Error(json.error || 'Failed to update content via API');
       }
       setIsUsingBackend(true);
       setIsUsingSupabase(json.storage === 'supabase');
     } catch (err) {
-      console.error('Failed to update content via Express API:', err);
+      console.error('Failed to update content via API:', err);
       throw err;
     }
   };
