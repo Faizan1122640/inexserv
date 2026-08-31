@@ -1,9 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import fallbackData from '../data/data.json';
 
 export default function Header({ data, onOpenContact }) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const navigate = useNavigate();
   const header = data || fallbackData.header;
+
+  const handleContactClick = () => {
+    if (onOpenContact) {
+      onOpenContact();
+    } else {
+      navigate('/contact');
+    }
+  };
 
   // Bind Services mega dropdown using JS hover
   useEffect(() => {
@@ -42,25 +52,20 @@ export default function Header({ data, onOpenContact }) {
   }, []);
 
   return (
-    <div style={{ opacity: 1 }}>
-      <div>
-        {/* ── Main Navbar Bar ── */}
-        <div className="w-full z-[999] fixed shadow-md top-0 bg-white flex px-4 sm:px-0 py-4">
-          <div className="max-w-[1800px] md:w-[90%] w-full md:px-0 mx-auto flex bg-white items-center justify-between">
-            <nav className="relative flex items-center justify-between w-full bg-white">
-
-              {/* Brand Logo */}
-              <a className="font-bold cursor-pointer mr-8 transition-opacity duration-200" href="/">
+    <div className="w-full relative z-40">
+      <div className="fixed top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm">
+        <div className="max-w-[1440px] md:w-[90%] mx-auto px-4 md:px-0">
+          <div className="h-20 flex items-center justify-between">
+            <nav className="flex items-center justify-between w-full">
+              {/* Logo */}
+              <Link to="/" className="flex items-center z-20">
                 <img
-                  alt="IES"
-                  width="3376"
-                  height="948"
-                  decoding="async"
-                  className="w-auto h-10 md:h-16 transition-transform duration-200 hover:scale-105"
+                  alt="Integrated Excellence Services"
+                  className="w-auto h-9 sm:h-10 cursor-pointer object-contain"
                   style={{ color: 'transparent' }}
                   src="/images/inexserv-logo.png"
                 />
-              </a>
+              </Link>
 
               {/* Desktop Nav Links */}
               <ul className="hidden lg:flex flex-1 justify-center items-center space-x-7 text-base font-medium text-sky-secondary">
@@ -68,8 +73,8 @@ export default function Header({ data, onOpenContact }) {
                   if (link.hasDropdown) {
                     return (
                       <li key={link.label} id="services-nav-item" className="relative z-20 hover:text-sky-primary group py-2">
-                        <button className="flex items-center justify-between text-sm hover:text-yellow-primary transition-colors duration-200 py-2">
-                          <span className="cursor-pointer text-base font-normal hover:text-sky-primary text-sky-secondary">{link.label}</span>
+                        <button className="flex items-center justify-between text-sm hover:text-yellow-primary transition-colors duration-200 py-2 cursor-pointer">
+                          <span className="text-base font-normal hover:text-sky-primary text-sky-secondary">{link.label}</span>
                           <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 448 512"
                             className="ml-1.5 w-4 h-3 transition-transform duration-200" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
                             <path d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z"></path>
@@ -126,9 +131,10 @@ export default function Header({ data, onOpenContact }) {
 
               {/* Contact Us Button */}
               <button
-                onClick={onOpenContact}
-                className="hidden lg:inline-block ml-8 px-4 cursor-pointer py-2 rounded-lg bg-sky-primary text-white md:text-lg text-base shadow hover:rounded-full hover:shadow-lg hover:bg-sky-primary/90 transition-all duration-300">
-                {header.contactButtonText}
+                type="button"
+                onClick={handleContactClick}
+                className="hidden lg:inline-block ml-8 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#04A552] to-emerald-500 hover:from-emerald-600 hover:to-[#04A552] text-white font-semibold text-base shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer">
+                {header.contactButtonText || 'Contact Us'}
               </button>
 
               {/* Mobile hamburger */}
@@ -158,7 +164,9 @@ export default function Header({ data, onOpenContact }) {
             <div className="absolute inset-0 bg-gray-900/90" onClick={() => setIsMobileOpen(false)}></div>
             <nav className="relative h-full w-full max-w-[300px] ml-auto bg-white overflow-y-auto">
               <div className="flex items-center justify-between p-4 border-b border-slate-100">
-                <img alt="IES" className="w-auto h-8" src="/images/inexserv-logo.png" />
+                <Link to="/" onClick={() => setIsMobileOpen(false)}>
+                  <img alt="IES" className="w-auto h-8" src="/images/inexserv-logo.png" />
+                </Link>
                 <button onClick={() => setIsMobileOpen(false)} className="p-1.5 rounded-md hover:bg-slate-100">
                   <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 256 256"
                     className="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
@@ -173,9 +181,11 @@ export default function Header({ data, onOpenContact }) {
                     {link.label}
                   </a>
                 ))}
-                <button onClick={() => { setIsMobileOpen(false); onOpenContact?.(); }}
-                  className="w-full mt-4 py-3 rounded-xl bg-sky-primary text-white font-semibold text-center hover:bg-emerald-600 transition-colors">
-                  {header.contactButtonText}
+                <button
+                  type="button"
+                  onClick={() => { setIsMobileOpen(false); handleContactClick(); }}
+                  className="w-full mt-4 py-3 rounded-xl bg-gradient-to-r from-[#04A552] to-emerald-500 text-white font-semibold text-center hover:from-emerald-600 hover:to-[#04A552] transition-all cursor-pointer shadow-md">
+                  {header.contactButtonText || 'Contact Us'}
                 </button>
               </div>
             </nav>

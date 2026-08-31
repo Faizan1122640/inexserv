@@ -29,6 +29,7 @@ export default function AdminLeadsManager({
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedLead, setSelectedLead] = useState(null);
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState('');
   const [newLead, setNewLead] = useState({
@@ -286,7 +287,14 @@ export default function AdminLeadsManager({
                         {lead.created_at ? new Date(lead.created_at).toLocaleString() : 'Just now'}
                       </td>
 
-                      <td className="py-4 px-5 text-right whitespace-nowrap">
+                      <td className="py-4 px-5 text-right whitespace-nowrap space-x-1">
+                        <button
+                          onClick={() => setSelectedLead(lead)}
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-[#074476] hover:bg-slate-100 transition-colors cursor-pointer"
+                          title="View Complete Lead Details & Form Fields"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </button>
                         <button
                           onClick={() => handleDeleteLead(lead.id)}
                           className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
@@ -417,6 +425,99 @@ export default function AdminLeadsManager({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* View Lead Details & Custom Form Fields Modal */}
+      {selectedLead && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 space-y-5 my-auto max-h-[90vh] overflow-y-auto animate-fadeIn font-sans">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                  Lead Inquiry Details
+                </span>
+                <h3 className="text-lg font-bold text-[#0f2b48]">
+                  {selectedLead.name || 'Anonymous Inquiry'}
+                </h3>
+              </div>
+              <button
+                onClick={() => setSelectedLead(null)}
+                className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <span className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Email Address</span>
+                <a href={`mailto:${selectedLead.email}`} className="text-xs font-bold text-[#074476] hover:underline break-all">
+                  {selectedLead.email || 'N/A'}
+                </a>
+              </div>
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <span className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Phone Number</span>
+                <a href={`tel:${selectedLead.phone}`} className="text-xs font-bold text-[#074476] hover:underline">
+                  {selectedLead.phone || 'N/A'}
+                </a>
+              </div>
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <span className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Company / Organization</span>
+                <span className="text-xs font-bold text-slate-700">
+                  {selectedLead.company || 'N/A'}
+                </span>
+              </div>
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <span className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Status</span>
+                <span className="text-xs font-bold text-emerald-700">
+                  {selectedLead.status || 'New'}
+                </span>
+              </div>
+            </div>
+
+            {/* Custom Dynamic Form Fields */}
+            {selectedLead.formData && Object.keys(selectedLead.formData).length > 0 && (
+              <div className="space-y-2">
+                <span className="text-xs font-bold text-[#0f2b48] block">Custom Form Submission Data</span>
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
+                  {Object.entries(selectedLead.formData)
+                    .filter(([key]) => !['id', 'created_at', 'status'].includes(key))
+                    .map(([key, val]) => (
+                      <div key={key} className="flex flex-col sm:flex-row sm:justify-between sm:items-start text-xs border-b border-slate-200/60 pb-1.5 last:border-b-0 last:pb-0 gap-1">
+                        <span className="font-bold text-slate-600 capitalize">
+                          {key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}:
+                        </span>
+                        <span className="text-slate-800 font-medium sm:text-right max-w-xs break-words">
+                          {typeof val === 'boolean' ? (val ? 'Yes' : 'No') : String(val || 'N/A')}
+                        </span>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            {/* Notes / Message */}
+            {selectedLead.notes && (
+              <div className="space-y-1">
+                <span className="text-xs font-bold text-[#0f2b48] block">Inquiry Message / Notes</span>
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 leading-relaxed whitespace-pre-line">
+                  {selectedLead.notes}
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-[11px] text-slate-400">
+              <span>Submitted: {selectedLead.created_at ? new Date(selectedLead.created_at).toLocaleString() : 'N/A'}</span>
+              <button
+                type="button"
+                onClick={() => setSelectedLead(null)}
+                className="px-4 py-2 bg-[#074476] text-white rounded-xl text-xs font-bold hover:bg-[#05335a] transition-colors cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

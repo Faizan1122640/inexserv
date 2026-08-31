@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Sparkles,
   Layers,
@@ -15,9 +15,17 @@ import {
   Phone,
   CheckCircle2,
   FileText,
-  Zap
+  Zap,
+  ArrowUp,
+  ArrowDown,
+  Edit3,
+  Eye,
+  Sliders,
+  Send,
+  RotateCcw
 } from 'lucide-react';
 import AdminImageUpload from './AdminImageUpload';
+import defaultData from '../../data/data.json';
 
 export default function AdminContentEditor({
   activeSection,
@@ -26,6 +34,20 @@ export default function AdminContentEditor({
   cmsSections = []
 }) {
   const currentSectionMeta = cmsSections.find((s) => s.id === activeSection) || cmsSections[0];
+
+  // Dynamic Form Builder State
+  const [newField, setNewField] = useState({
+    label: '',
+    subLabel: '',
+    name: '',
+    type: 'text',
+    placeholder: '',
+    required: false,
+    halfWidth: true,
+    options: ''
+  });
+  const [showAddFieldModal, setShowAddFieldModal] = useState(false);
+  const [editingFieldId, setEditingFieldId] = useState(null);
 
   // Helper to safely update top-level section data
   const updateSection = (sectionKey, updater) => {
@@ -772,6 +794,676 @@ export default function AdminContentEditor({
     );
   };
 
+  // Section: CONTACT US & DYNAMIC FORM BUILDER EDITOR
+  const renderContactUsEditor = () => {
+    const contact = formData.contactUs || {};
+    const directContact = contact.directContact || {};
+    const formConfig = contact.formConfig || {};
+    const fields = formConfig.fields || [];
+
+    const handleAddField = () => {
+      if (!newField.label.trim()) {
+        alert('Please enter a field label');
+        return;
+      }
+      const generatedName =
+        newField.name.trim() ||
+        newField.label
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g, '_')
+          .replace(/^_+|_+$/g, '');
+
+      const parsedOptions =
+        newField.type === 'select'
+          ? typeof newField.options === 'string'
+            ? newField.options
+                .split(',')
+                .map((o) => o.trim())
+                .filter(Boolean)
+            : newField.options
+          : undefined;
+
+      const finalOptions =
+        newField.type === 'select'
+          ? parsedOptions && parsedOptions.length > 0
+            ? parsedOptions
+            : ['Option 1', 'Option 2', 'Option 3']
+          : undefined;
+
+      const fieldObj = {
+        id: `field_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+        name: generatedName,
+        label: newField.label.trim(),
+        subLabel: newField.subLabel ? newField.subLabel.trim() : undefined,
+        type: newField.type || 'text',
+        placeholder: newField.placeholder || '',
+        required: Boolean(newField.required),
+        halfWidth: Boolean(newField.halfWidth),
+        ...(finalOptions && { options: finalOptions })
+      };
+
+      updateSection('contactUs', (c) => {
+        const currFields = (c.formConfig && c.formConfig.fields) || [];
+        return {
+          ...c,
+          formConfig: {
+            ...(c.formConfig || {}),
+            fields: [...currFields, fieldObj]
+          }
+        };
+      });
+
+      setNewField({
+        label: '',
+        subLabel: '',
+        name: '',
+        type: 'text',
+        placeholder: '',
+        required: false,
+        halfWidth: true,
+        options: ''
+      });
+      setShowAddFieldModal(false);
+    };
+
+    const handleDeleteField = (fieldId) => {
+      if (!window.confirm('Are you sure you want to remove this form field?')) return;
+      updateSection('contactUs', (c) => {
+        const currFields = (c.formConfig && c.formConfig.fields) || [];
+        return {
+          ...c,
+          formConfig: {
+            ...(c.formConfig || {}),
+            fields: currFields.filter((f) => f.id !== fieldId)
+          }
+        };
+      });
+    };
+
+    const handleMoveField = (index, direction) => {
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= fields.length) return;
+      updateSection('contactUs', (c) => {
+        const currFields = [...((c.formConfig && c.formConfig.fields) || [])];
+        const temp = currFields[index];
+        currFields[index] = currFields[targetIndex];
+        currFields[targetIndex] = temp;
+        return {
+          ...c,
+          formConfig: {
+            ...(c.formConfig || {}),
+            fields: currFields
+          }
+        };
+      });
+    };
+
+    const handleUpdateFieldProp = (fieldId, propKey, propVal) => {
+      updateSection('contactUs', (c) => {
+        const currFields = ((c.formConfig && c.formConfig.fields) || []).map((f) => {
+          if (f.id === fieldId) {
+            return { ...f, [propKey]: propVal };
+          }
+          return f;
+        });
+        return {
+          ...c,
+          formConfig: {
+            ...(c.formConfig || {}),
+            fields: currFields
+          }
+        };
+      });
+    };
+
+    return (
+      <div className="space-y-6">
+        {/* 1. Form General Settings */}
+        <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+          <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+            <Sliders className="w-4 h-4 text-[#074476]" />
+            <h4 className="text-sm font-bold text-[#0f2b48]">Form General Settings</h4>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Form Heading</label>
+              <input
+                type="text"
+                value={formConfig.formTitle || 'Send us a message'}
+                onChange={(e) =>
+                  updateSection('contactUs', (c) => ({
+                    ...c,
+                    formConfig: { ...(c.formConfig || {}), formTitle: e.target.value }
+                  }))
+                }
+                placeholder="e.g. Send us a message"
+                className="w-full p-2.5 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#04A552]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Submit Button Text</label>
+              <input
+                type="text"
+                value={formConfig.submitButtonText || 'SEND INQUIRY'}
+                onChange={(e) =>
+                  updateSection('contactUs', (c) => ({
+                    ...c,
+                    formConfig: { ...(c.formConfig || {}), submitButtonText: e.target.value }
+                  }))
+                }
+                placeholder="e.g. SEND INQUIRY"
+                className="w-full p-2.5 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#04A552]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Response Guarantee Text</label>
+              <input
+                type="text"
+                value={contact.responseSla || 'Guaranteed Response < 2 Hours'}
+                onChange={(e) =>
+                  updateSection('contactUs', (c) => ({ ...c, responseSla: e.target.value }))
+                }
+                placeholder="e.g. Guaranteed Response < 2 Hours"
+                className="w-full p-2.5 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#04A552]"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+            <div className="sm:col-span-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Success Title</label>
+              <input
+                type="text"
+                value={formConfig.successTitle || 'Inquiry Received!'}
+                onChange={(e) =>
+                  updateSection('contactUs', (c) => ({
+                    ...c,
+                    formConfig: { ...(c.formConfig || {}), successTitle: e.target.value }
+                  }))
+                }
+                placeholder="e.g. Inquiry Received!"
+                className="w-full p-2.5 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#04A552]"
+              />
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Success Message</label>
+              <input
+                type="text"
+                value={
+                  formConfig.successMessage ||
+                  'Thank you for reaching out. An executive consultant has received your inquiry and will get in touch within 2 hours.'
+                }
+                onChange={(e) =>
+                  updateSection('contactUs', (c) => ({
+                    ...c,
+                    formConfig: { ...(c.formConfig || {}), successMessage: e.target.value }
+                  }))
+                }
+                placeholder="Thank you message displayed after submission..."
+                className="w-full p-2.5 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#04A552]"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* 3. DYNAMIC FORM BUILDER */}
+        <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+            <div>
+              <h4 className="text-sm font-bold text-[#0f2b48] flex items-center gap-2">
+                <FileText className="w-4 h-4 text-[#04A552]" />
+                <span>Dynamic Form Fields Builder ({fields.length})</span>
+              </h4>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Add, reorder, configure required validation, or remove fields. All changes sync live to Supabase.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                type="button"
+                onClick={() => {
+                  if (window.confirm('Are you sure you want to restore all form fields to standard defaults?')) {
+                    const defaultFields = defaultData.contactUs.formConfig.fields;
+                    updateSection('contactUs', (c) => ({
+                      ...c,
+                      formConfig: {
+                        ...(c.formConfig || {}),
+                        fields: JSON.parse(JSON.stringify(defaultFields))
+                      }
+                    }));
+                  }
+                }}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all border border-slate-200 cursor-pointer shadow-sm"
+                title="Restore standard default form fields"
+              >
+                <RotateCcw className="w-3.5 h-3.5 text-slate-500" />
+                <span>Restore Default Fields</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowAddFieldModal(true)}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#04A552] hover:bg-emerald-600 text-white text-xs font-bold transition-all shadow-md cursor-pointer flex-shrink-0"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add New Field</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Add Field Modal / Expandable Box */}
+          {showAddFieldModal && (
+            <div className="p-5 rounded-2xl bg-slate-50 border-2 border-dashed border-[#04A552] space-y-4 animate-fadeIn">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-[#074476] uppercase tracking-wider">
+                  Create New Form Field
+                </span>
+                <button
+                  onClick={() => setShowAddFieldModal(false)}
+                  className="text-xs text-slate-400 hover:text-slate-600 font-bold cursor-pointer"
+                >
+                  ✕ Cancel
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">Field Label *</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. First Name"
+                    value={newField.label}
+                    onChange={(e) => setNewField({ ...newField, label: e.target.value })}
+                    className="w-full p-2 border border-slate-200 rounded-xl text-xs bg-white focus:outline-none focus:border-[#04A552]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">Sub-label (e.g. First, Last)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. First"
+                    value={newField.subLabel}
+                    onChange={(e) => setNewField({ ...newField, subLabel: e.target.value })}
+                    className="w-full p-2 border border-slate-200 rounded-xl text-xs bg-white focus:outline-none focus:border-[#04A552]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">Field Key (API Name)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. firstName"
+                    value={newField.name}
+                    onChange={(e) => setNewField({ ...newField, name: e.target.value })}
+                    className="w-full p-2 border border-slate-200 rounded-xl text-xs bg-white focus:outline-none focus:border-[#04A552]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">Input Type</label>
+                  <select
+                    value={newField.type}
+                    onChange={(e) => setNewField({ ...newField, type: e.target.value })}
+                    className="w-full p-2 border border-slate-200 rounded-xl text-xs bg-white focus:outline-none focus:border-[#04A552]"
+                  >
+                    <option value="text">Text (Single Line)</option>
+                    <option value="email">Email Address</option>
+                    <option value="tel">Phone / Mobile</option>
+                    <option value="select">Dropdown Select</option>
+                    <option value="textarea">Textarea (Multi-line)</option>
+                    <option value="number">Number</option>
+                    <option value="checkbox">Checkbox (Yes/No)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">Placeholder Text</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Select your budget range..."
+                    value={newField.placeholder}
+                    onChange={(e) => setNewField({ ...newField, placeholder: e.target.value })}
+                    className="w-full p-2 border border-slate-200 rounded-xl text-xs bg-white focus:outline-none focus:border-[#04A552]"
+                  />
+                </div>
+
+                {newField.type === 'select' && (
+                  <div className="sm:col-span-2">
+                    <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                      Dropdown Options (comma-separated)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. <$10k, $10k-$50k, $50k-$100k, $100k+"
+                      value={newField.options}
+                      onChange={(e) => setNewField({ ...newField, options: e.target.value })}
+                      className="w-full p-2 border border-slate-200 rounded-xl text-xs bg-white focus:outline-none focus:border-[#04A552]"
+                    />
+                  </div>
+                )}
+
+                <div className="flex items-center gap-6 pt-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={newField.required}
+                      onChange={(e) => setNewField({ ...newField, required: e.target.checked })}
+                      className="w-4 h-4 text-[#04A552] rounded border-slate-300 focus:ring-[#04A552]"
+                    />
+                    <span className="text-xs font-semibold text-slate-700">Required Field</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={newField.halfWidth}
+                      onChange={(e) => setNewField({ ...newField, halfWidth: e.target.checked })}
+                      className="w-4 h-4 text-[#04A552] rounded border-slate-300 focus:ring-[#04A552]"
+                    />
+                    <span className="text-xs font-semibold text-slate-700">Half Width (Grid)</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={handleAddField}
+                  className="px-4 py-2 bg-[#04A552] hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all shadow cursor-pointer"
+                >
+                  Save &amp; Add Field
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Form Fields List */}
+          <div className="space-y-3">
+            {fields.map((field, idx) => {
+              const isEditing = editingFieldId === field.id;
+
+              return (
+                <div
+                  key={field.id || idx}
+                  className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-slate-300 transition-all space-y-3"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="w-6 h-6 rounded-lg bg-white border border-slate-200 text-[#074476] text-xs font-extrabold flex items-center justify-center flex-shrink-0 shadow-sm">
+                        {idx + 1}
+                      </span>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-[#0f2b48] truncate">
+                            {field.label}
+                          </span>
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-200 text-slate-600 font-mono">
+                            {field.name}
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-slate-400 block truncate">
+                          Placeholder: {field.placeholder || 'None'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {/* Type Badge */}
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-sky-100 text-sky-700 uppercase">
+                        {field.type}
+                      </span>
+
+                      {/* Required Toggle Badge */}
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateFieldProp(field.id, 'required', !field.required)}
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-md cursor-pointer transition-colors ${
+                          field.required
+                            ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                            : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
+                        }`}
+                        title="Click to toggle required status"
+                      >
+                        {field.required ? 'Required *' : 'Optional'}
+                      </button>
+
+                      {/* Width Badge */}
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateFieldProp(field.id, 'halfWidth', !field.halfWidth)}
+                        className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-purple-100 text-purple-700 cursor-pointer hover:bg-purple-200 transition-colors"
+                        title="Click to toggle between Half Width and Full Width"
+                      >
+                        {field.halfWidth ? 'Half Width (1/2)' : 'Full Width (1/1)'}
+                      </button>
+
+                      {/* Move Up / Down */}
+                      <button
+                        type="button"
+                        disabled={idx === 0}
+                        onClick={() => handleMoveField(idx, -1)}
+                        className="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-[#074476] disabled:opacity-30 cursor-pointer shadow-sm"
+                        title="Move Field Up"
+                      >
+                        <ArrowUp className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        disabled={idx === fields.length - 1}
+                        onClick={() => handleMoveField(idx, 1)}
+                        className="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-[#074476] disabled:opacity-30 cursor-pointer shadow-sm"
+                        title="Move Field Down"
+                      >
+                        <ArrowDown className="w-3.5 h-3.5" />
+                      </button>
+
+                      {/* Edit Inline Toggle */}
+                      <button
+                        type="button"
+                        onClick={() => setEditingFieldId(isEditing ? null : field.id)}
+                        className="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-emerald-600 cursor-pointer shadow-sm"
+                        title="Edit Field Configuration"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                      </button>
+
+                      {/* Delete */}
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteField(field.id)}
+                        className="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-red-600 cursor-pointer shadow-sm"
+                        title="Delete Field"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Expanded Edit Form */}
+                  {isEditing && (
+                    <div className="pt-3 border-t border-slate-200 grid grid-cols-1 sm:grid-cols-4 gap-3 animate-fadeIn">
+                      <div>
+                        <label className="block text-[10px] font-semibold text-slate-600 mb-1">Field Label</label>
+                        <input
+                          type="text"
+                          value={field.label}
+                          onChange={(e) => handleUpdateFieldProp(field.id, 'label', e.target.value)}
+                          className="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-semibold text-slate-600 mb-1">Sub-label (e.g. First, Last)</label>
+                        <input
+                          type="text"
+                          value={field.subLabel || ''}
+                          onChange={(e) => handleUpdateFieldProp(field.id, 'subLabel', e.target.value)}
+                          className="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white"
+                          placeholder="e.g. First"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-semibold text-slate-600 mb-1">Placeholder</label>
+                        <input
+                          type="text"
+                          value={field.placeholder || ''}
+                          onChange={(e) => handleUpdateFieldProp(field.id, 'placeholder', e.target.value)}
+                          className="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-semibold text-slate-600 mb-1">Input Type</label>
+                        <select
+                          value={field.type}
+                          onChange={(e) => handleUpdateFieldProp(field.id, 'type', e.target.value)}
+                          className="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white"
+                        >
+                          <option value="text">Text</option>
+                          <option value="email">Email</option>
+                          <option value="tel">Phone / Tel</option>
+                          <option value="select">Dropdown Select</option>
+                          <option value="textarea">Textarea</option>
+                          <option value="number">Number</option>
+                          <option value="checkbox">Checkbox</option>
+                        </select>
+                      </div>
+
+                      {field.type === 'select' && (
+                        <div className="sm:col-span-3">
+                          <label className="block text-[10px] font-semibold text-slate-600 mb-1">
+                            Options (comma-separated)
+                          </label>
+                          <input
+                            type="text"
+                            value={Array.isArray(field.options) ? field.options.join(', ') : field.options || ''}
+                            onChange={(e) =>
+                              handleUpdateFieldProp(
+                                field.id,
+                                'options',
+                                e.target.value.split(',').map((s) => s.trim()).filter(Boolean)
+                              )
+                            }
+                            className="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 4. LIVE FORM PREVIEW MOCKUP */}
+        <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <h4 className="text-sm font-bold text-[#0f2b48] flex items-center gap-2">
+              <Eye className="w-4 h-4 text-[#074476]" />
+              <span>Live Visual Form Preview (What visitors see on /contact)</span>
+            </h4>
+            <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full">
+              Live Interactive Mockup
+            </span>
+          </div>
+
+          <div className="max-w-4xl mx-auto rounded-3xl overflow-hidden border border-slate-300 shadow-xl grid grid-cols-1 md:grid-cols-12 min-h-[420px]">
+            {/* Left Image Mockup */}
+            <div className="md:col-span-5 relative bg-[#131b23] overflow-hidden flex items-center justify-center p-6 text-center">
+              <img
+                src="https://images.unsplash.com/photo-1520923642038-b4259acecca7?auto=format&fit=crop&w=800&q=80"
+                alt="Vintage Phone preview"
+                className="absolute inset-0 w-full h-full object-cover filter brightness-90"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+              <div className="relative z-10">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-300/40 to-emerald-500/40 backdrop-blur-md border border-white/50 shadow-2xl inline-flex items-center justify-center mb-3">
+                  <Mail className="w-8 h-8 text-white stroke-[1.75]" />
+                </div>
+                <div className="px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-white text-[10px] font-semibold">
+                  ⚡ Guaranteed Response &lt; 2 Hours
+                </div>
+              </div>
+            </div>
+
+            {/* Right Light-Blue Form Panel */}
+            <div className="md:col-span-7 bg-[#dcebf9] p-6 md:p-8 flex flex-col justify-between">
+              <div>
+                <h5 className="text-xl font-extrabold text-[#0f2b48] mb-4">
+                  {formConfig.formTitle || 'Send us a message'}
+                </h5>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {fields.map((f) => (
+                    <div
+                      key={f.id}
+                      className={f.halfWidth ? 'sm:col-span-1' : 'sm:col-span-2'}
+                    >
+                      <label className="block text-xs font-bold text-[#0f2b48] mb-1">
+                        {f.label} {f.required && <span className="text-red-500">*</span>}
+                      </label>
+                      {f.type === 'textarea' ? (
+                        <div>
+                          <textarea
+                            rows={3}
+                            disabled
+                            placeholder={f.placeholder}
+                            className="w-full p-2.5 rounded-md border border-[#3b4b60]/60 text-xs bg-[#d5e7f7]/90 text-slate-800 opacity-90 cursor-not-allowed shadow-inner"
+                          />
+                          {f.subLabel && (
+                            <span className="block text-[10px] text-slate-500 font-medium mt-0.5">
+                              {f.subLabel}
+                            </span>
+                          )}
+                        </div>
+                      ) : f.type === 'select' ? (
+                        <select
+                          disabled
+                          className="w-full p-2.5 rounded-md border border-[#3b4b60]/60 text-xs bg-[#d5e7f7]/90 text-slate-800 opacity-90 cursor-not-allowed shadow-inner"
+                        >
+                          <option>{f.placeholder || 'Select option...'}</option>
+                          {(f.options || []).map((o, idx) => (
+                            <option key={idx}>{o}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <div>
+                          <input
+                            type={f.type || 'text'}
+                            disabled
+                            placeholder={f.placeholder}
+                            className="w-full p-2.5 rounded-md border border-[#3b4b60]/60 text-xs bg-[#d5e7f7]/90 text-slate-800 opacity-90 cursor-not-allowed shadow-inner"
+                          />
+                          {f.subLabel && (
+                            <span className="block text-[10px] text-slate-500 font-medium mt-0.5">
+                              {f.subLabel}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-5">
+                  <button
+                    type="button"
+                    disabled
+                    className="px-8 py-3 bg-[#007aff] text-white rounded-md text-xs font-extrabold uppercase tracking-wider opacity-90 cursor-not-allowed shadow"
+                  >
+                    {formConfig.submitButtonText || 'SEND INQUIRY'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6 animate-fadeIn font-sans">
       {/* Section Header Card */}
@@ -792,8 +1484,9 @@ export default function AdminContentEditor({
       {/* Editor Body */}
       {activeSection === 'header' && renderHeaderEditor()}
       {activeSection === 'hero' && renderHeroEditor()}
+      {activeSection === 'contactUs' && renderContactUsEditor()}
       {activeSection === 'servicesSection' && renderServicesEditor()}
-      {!['header', 'hero', 'servicesSection'].includes(activeSection) && (
+      {!['header', 'hero', 'contactUs', 'servicesSection'].includes(activeSection) && (
         <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
           {renderGenericFields(formData[activeSection], [activeSection], currentSectionMeta.label)}
         </div>

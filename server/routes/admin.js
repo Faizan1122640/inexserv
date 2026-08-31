@@ -1,5 +1,11 @@
 const express = require('express');
 const supabase = require('../config/supabaseClient');
+const {
+  BadRequestError,
+  ServiceUnavailableError,
+  NotFoundError,
+  errorMessages
+} = require('../errors');
 
 const router = express.Router();
 
@@ -9,17 +15,11 @@ router.get('/:email', async (req, res, next) => {
     const { email } = req.params;
 
     if (!email) {
-      return res.status(400).json({
-        success: false,
-        error: 'Email parameter is required'
-      });
+      throw new BadRequestError('Email parameter is required');
     }
 
     if (!supabase) {
-      return res.status(500).json({
-        success: false,
-        error: 'Database client unavailable'
-      });
+      throw new ServiceUnavailableError(errorMessages.DATABASE_UNAVAILABLE);
     }
 
     const cleanEmail = email.trim().toLowerCase();
@@ -43,10 +43,7 @@ router.get('/:email', async (req, res, next) => {
       }
     }
 
-    return res.status(404).json({
-      success: false,
-      error: `Admin with email '${email}' not found`
-    });
+    throw new NotFoundError(errorMessages.ADMIN_NOT_FOUND, `Admin with email '${email}' not found`);
   } catch (err) {
     return next(err);
   }

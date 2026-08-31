@@ -3,6 +3,7 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 const supabase = require('../config/supabaseClient');
+const { BadRequestError, errorMessages } = require('../errors');
 
 // Ensure local uploads directory exists as a fail-safe fallback
 const localUploadsDir = path.join(__dirname, '../../public/uploads');
@@ -20,15 +21,12 @@ if (!fs.existsSync(localUploadsDir)) {
  * 1. Supabase Storage Bucket ('website-assets', 'cms-images', 'public', etc.)
  * 2. Local public fallback for 100% uninterrupted offline & local development
  */
-router.post('/', async (req, res) => {
+router.post('/', async (req, res, next) => {
   try {
     const { fileBase64, fileName, fileType, bucket = 'website-assets' } = req.body;
 
     if (!fileBase64) {
-      return res.status(400).json({
-        success: false,
-        error: 'No image file payload provided (fileBase64 is required).'
-      });
+      throw new BadRequestError(errorMessages.UPLOAD_NO_FILE);
     }
 
     // Clean base64 string
@@ -96,11 +94,7 @@ router.post('/', async (req, res) => {
       message: 'Image uploaded successfully to public web directory'
     });
   } catch (err) {
-    console.error('❌ Image Upload Error:', err);
-    return res.status(500).json({
-      success: false,
-      error: 'Failed to upload image: ' + err.message
-    });
+    return next(err);
   }
 });
 

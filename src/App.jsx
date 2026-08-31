@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Preloader from './components/Preloader';
 import Header from './components/Header';
 import Hero from './components/Hero';
@@ -9,6 +9,7 @@ import TechStackSection from './components/TechStackSection';
 import CtaBannerSection from './components/CtaBannerSection';
 import HireDevSection from './components/HireDevSection';
 import FooterSection from './components/FooterSection';
+import ContactUs from './pages/ContactUs';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -44,6 +45,8 @@ export default function App() {
     <Router>
       <Routes>
         <Route path="/" element={<MainWebsite />} />
+        <Route path="/contact" element={<ContactUs />} />
+        <Route path="/contact-us" element={<Navigate to="/contact" replace />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route
           path="/admin/dashboard"
@@ -53,6 +56,8 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        {/* Fallback to home */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );

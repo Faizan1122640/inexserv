@@ -750,5 +750,91 @@
         "href": "/terms-and-conditions"
       }
     ]
+  },
+  "contactUs": {
+    "badge": "GET IN TOUCH",
+    "titleLine1": "Send us a message",
+    "titleHighlight": "We're here to help",
+    "subtitle": "Have a question, custom project, or looking to scale your engineering team? Reach out and we will reply within 2 hours.",
+    "responseSla": "Guaranteed Response < 2 Hours",
+    "leftImage": "https://images.unsplash.com/photo-1520923642038-b4259acecca7?auto=format&fit=crop&w=1200&q=80",
+    "directContact": {
+      "phone": "+968 9577 3070",
+      "email": "Info@inexserv.com",
+      "managementEmail": "management@inexserv.com",
+      "hours": "Mon - Fri: 9:00 AM - 6:00 PM (GST)"
+    },
+    "formConfig": {
+      "formTitle": "Send us a message",
+      "submitButtonText": "SEND INQUIRY",
+      "successTitle": "Inquiry Received!",
+      "successMessage": "Thank you for reaching out. An executive consultant has received your inquiry and will get in touch within 2 hours.",
+      "fields": [
+        {
+          "id": "field_full_name",
+          "name": "fullName",
+          "label": "Full Name",
+          "type": "text",
+          "placeholder": "e.g. Faizan Ali",
+          "required": true,
+          "halfWidth": true
+        },
+        {
+          "id": "field_work_email",
+          "name": "email",
+          "label": "Work Email",
+          "type": "email",
+          "placeholder": "name@company.com",
+          "required": true,
+          "halfWidth": true
+        },
+        {
+          "id": "field_phone_number",
+          "name": "phone",
+          "label": "Phone Number",
+          "type": "tel",
+          "placeholder": "+968 0000 0000",
+          "required": false,
+          "halfWidth": true
+        },
+        {
+          "id": "field_company_org",
+          "name": "company",
+          "label": "Company / Organization",
+          "type": "text",
+          "placeholder": "e.g. Acme Innovations",
+          "required": false,
+          "halfWidth": true
+        },
+        {
+          "id": "field_interested_service",
+          "name": "service",
+          "label": "Interested Service",
+          "type": "select",
+          "placeholder": "Select a primary service area",
+          "required": false,
+          "halfWidth": false,
+          "options": [
+            "AI Development & Machine Learning",
+            "Full-Stack Web & Cloud Platforms",
+            "Mobile Application (iOS / Android)",
+            "Desktop & Electron Software",
+            "Blockchain & Smart Contracts",
+            "Automation, DevOps & Cloud Migration",
+            "Dedicated Developer Team Hire",
+            "Strategic IT Consultation"
+          ]
+        },
+        {
+          "id": "field_project_details",
+          "name": "notes",
+          "label": "Project Details & Requirements",
+          "type": "textarea",
+          "placeholder": "Tell us about your project objectives, expected timeline, and key requirements...",
+          "required": true,
+          "halfWidth": false
+        }
+      ]
+    }
   }
 }

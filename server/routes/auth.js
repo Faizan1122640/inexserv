@@ -1,28 +1,28 @@
 const express = require('express');
 const supabase = require('../config/supabaseClient');
+const {
+  BadRequestError,
+  UnauthorizedError,
+  ServiceUnavailableError,
+  errorMessages
+} = require('../errors');
 
 const router = express.Router();
 
-// POST /api/auth/login - Direct Supabase Auth Verification (No hardcoded credentials)
-router.post('/login', async (req, res) => {
+// POST /api/auth/login - Direct Supabase Auth Verification
+router.post('/login', async (req, res, next) => {
   try {
     const { email, password } = req.body || {};
 
     if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        error: 'Email and password are required'
-      });
+      throw new BadRequestError(errorMessages.AUTH_EMAIL_PASSWORD_REQUIRED);
     }
 
     const cleanEmail = email.trim().toLowerCase();
     const cleanPass = password.trim();
 
     if (!supabase) {
-      return res.status(500).json({
-        success: false,
-        error: 'Supabase authentication service unavailable'
-      });
+      throw new ServiceUnavailableError(errorMessages.AUTH_SERVICE_UNAVAILABLE);
     }
 
     // Direct Supabase Auth verification
@@ -32,10 +32,10 @@ router.post('/login', async (req, res) => {
     });
 
     if (error || !data || !data.session) {
-      return res.status(401).json({
-        success: false,
-        error: error ? error.message : 'Invalid email or password. Access Denied.'
-      });
+      throw new UnauthorizedError(
+        errorMessages.AUTH_INVALID_CREDENTIALS,
+        error ? error.message : undefined
+      );
     }
 
     return res.status(200).json({
@@ -51,11 +51,7 @@ router.post('/login', async (req, res) => {
       }
     });
   } catch (err) {
-    console.error('Login error:', err);
-    return res.status(401).json({
-      success: false,
-      error: 'Authentication failed. Please check your credentials.'
-    });
+    return next(err);
   }
 });
 

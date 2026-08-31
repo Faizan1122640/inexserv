@@ -12,7 +12,8 @@ import {
   Menu,
   ChevronLeft,
   LogOut,
-  Layers
+  Layers,
+  Mail
 } from 'lucide-react';
 
 export default function AdminSidebar({
@@ -27,6 +28,7 @@ export default function AdminSidebar({
   const iconMap = {
     header: Compass,
     hero: Sparkles,
+    contactUs: Mail,
     servicesSection: Briefcase,
     solutionsSection: Zap,
     techStackSection: Code2,

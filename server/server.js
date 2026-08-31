@@ -63,26 +63,16 @@ app.use(['/api/leads', '/leads'], leadsRouter);
 app.use(['/api/admin', '/admin'], adminRouter);
 app.use(['/api/upload', '/upload'], uploadRouter);
 
+const errorHandler = require('./middlewares/errorHandler');
+const { NotFoundError } = require('./errors');
+
 // Handle 404 Route Not Found
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    error: `Route '${req.originalUrl}' not found`
-  });
+app.use((req, res, next) => {
+  next(new NotFoundError(`Route '${req.originalUrl}' not found`));
 });
 
-// Central 4-argument Error Handling Middleware
-app.use((err, req, res, next) => {
-  console.error('❌ Server Error:', err);
-
-  const statusCode = err.statusCode || err.status || 500;
-  const errorMessage = err.message || 'Internal Server Error';
-
-  return res.status(statusCode).json({
-    success: false,
-    error: errorMessage
-  });
-});
+// Central Error Handling Middleware (MUST BE REGISTERED LAST)
+app.use(errorHandler);
 
 // Only listen on port if running directly via CLI (not imported by Vercel serverless)
 if (!process.env.VERCEL && !process.env.VERCEL_ENV && require.main === module) {

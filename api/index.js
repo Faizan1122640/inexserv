@@ -34,6 +34,9 @@ if (supabaseUrl && supabaseKey) {
   }
 }
 
+// In-memory leads storage fallback for serverless
+let serverlessLeadsCache = [];
+
 // CORS configuration
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
@@ -61,7 +64,6 @@ app.get(['/api/health', '/health'], (req, res) => {
 
 // GET Content Route - Real-time with zero caching
 app.get(['/api/content', '/content'], async (req, res) => {
-  // Prevent any Edge or Browser caching
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
   res.setHeader('Pragma', 'no-cache');
   res.setHeader('Expires', '0');
@@ -71,7 +73,6 @@ app.get(['/api/content', '/content'], async (req, res) => {
 
   try {
     if (supabase) {
-      // 8s timeout to avoid any premature fallback on initial cold starts
       const fetchPromise = supabase
         .from('site_content')
         .select('data')
@@ -131,7 +132,6 @@ app.put(['/api/content', '/content'], async (req, res) => {
           error: `Database write failed: ${error.message}`
         });
       }
-      console.log('✅ Supabase site_content updated successfully');
 
       const savedData = data && data[0] && data[0].data ? data[0].data : newContent;
       return res.status(200).json({
@@ -139,8 +139,6 @@ app.put(['/api/content', '/content'], async (req, res) => {
         data: savedData,
         storage: 'supabase'
       });
-    } else {
-      console.warn('⚠️ Supabase client not initialized in PUT /api/content');
     }
   } catch (err) {
     console.error('❌ Supabase update exception:', err.message);
@@ -155,6 +153,234 @@ app.put(['/api/content', '/content'], async (req, res) => {
     data: newContent,
     storage: 'fallback'
   });
+});
+
+// ── LEADS ROUTES ──
+// GET /api/leads - Fetch all leads
+app.get(['/api/leads', '/leads'], async (req, res) => {
+  try {
+    if (supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('leads')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (!error && Array.isArray(data)) {
+          return res.status(200).json({
+            success: true,
+            data
+          });
+        }
+      } catch (e) {
+        console.warn('Supabase get leads notice:', e.message);
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: serverlessLeadsCache
+    });
+  } catch (err) {
+    return res.status(200).json({
+      success: true,
+      data: []
+    });
+  }
+});
+
+// Set of known columns to prevent redundant RPC calls
+const knownColumns = new Set([
+  'id',
+  'created_at',
+  'name',
+  'full_name',
+  'email',
+  'phone',
+  'company',
+  'status',
+  'notes',
+  'form_data'
+]);
+
+// Helper to sanitize any field key into a valid safe PostgreSQL column identifier
+function sanitizeColumnName(rawKey) {
+  return String(rawKey || '')
+    .trim()
+    .replace(/([a-z])([A-Z])/g, '$1_$2') // camelCase to snake_case
+    .toLowerCase()
+    .replace(/[^a-z0-9_]/g, '_')         // replace non-alphanumeric with _
+    .replace(/^_+|_+$/g, '')             // trim leading/trailing _
+    .substring(0, 63);                  // PostgreSQL max identifier length is 63
+}
+
+// Ensure columns exist dynamically in Supabase leads table via RPC
+async function ensureLeadColumnsExist(fieldKeys) {
+  if (!supabase) return;
+  for (const rawKey of fieldKeys) {
+    const colName = sanitizeColumnName(rawKey);
+    if (!colName || knownColumns.has(colName)) continue;
+
+    try {
+      const { error } = await supabase.rpc('add_lead_column', {
+        column_name: colName,
+        column_type: 'text'
+      });
+
+      if (!error) {
+        knownColumns.add(colName);
+        console.log(`✓ Supabase column '${colName}' ensured in leads table.`);
+      } else {
+        console.warn(`Notice ensuring column '${colName}':`, error.message);
+      }
+    } catch (e) {
+      console.warn(`Dynamic column RPC error for '${colName}':`, e.message);
+    }
+  }
+}
+
+// POST /api/leads - Create lead with dynamic columns support
+app.post(['/api/leads', '/leads'], async (req, res) => {
+  try {
+    const bodyData = req.body || {};
+    const leadId = `lead_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+    const createdAt = new Date().toISOString();
+
+    const name = bodyData.name || bodyData.fullName || 'Anonymous Inquiry';
+    const email = bodyData.email || bodyData.workEmail || 'not-provided@inquiry.com';
+    const phone = bodyData.phone || bodyData.phoneNumber || '';
+    const company = bodyData.company || bodyData.organization || '';
+    const status = bodyData.status || 'New';
+
+    // Extract dynamic fields (both from root payload and formData if passed)
+    const dynamicFields = { ...(bodyData.formData || {}), ...bodyData };
+    delete dynamicFields.id;
+    delete dynamicFields.created_at;
+    delete dynamicFields.formData;
+
+    // Collect all field keys that should be real columns in PostgreSQL
+    const allFieldKeys = Object.keys(dynamicFields);
+
+    // 1. Automatically ensure columns exist in Supabase at runtime
+    await ensureLeadColumnsExist(allFieldKeys);
+
+    let notes = bodyData.notes || bodyData.message || '';
+    const extraFieldKeys = Object.keys(dynamicFields).filter(
+      k => !['name', 'fullName', 'email', 'workEmail', 'phone', 'phoneNumber', 'company', 'organization', 'status', 'notes', 'message'].includes(k)
+    );
+
+    if (extraFieldKeys.length > 0) {
+      const formattedExtras = extraFieldKeys
+        .map(k => `• ${k.charAt(0).toUpperCase() + k.slice(1)}: ${dynamicFields[k]}`)
+        .join('\n');
+      notes = notes ? `${notes}\n\n[Custom Form Fields]:\n${formattedExtras}` : `[Custom Form Fields]:\n${formattedExtras}`;
+    }
+
+    const fullLead = {
+      id: leadId,
+      name,
+      email,
+      phone,
+      company,
+      status,
+      notes,
+      ...dynamicFields,
+      formData: dynamicFields,
+      created_at: createdAt
+    };
+
+    if (supabase) {
+      try {
+        const insertPayload = {
+          name,
+          email,
+          phone,
+          company,
+          status,
+          notes,
+          form_data: dynamicFields
+        };
+
+        // Add each dynamic field as a direct column property
+        for (const [k, v] of Object.entries(dynamicFields)) {
+          const colName = sanitizeColumnName(k);
+          if (colName && !insertPayload[colName]) {
+            insertPayload[colName] = typeof v === 'object' ? JSON.stringify(v) : String(v ?? '');
+          }
+        }
+
+        const { data, error } = await supabase
+          .from('leads')
+          .insert([insertPayload])
+          .select();
+
+        if (!error && data && data.length > 0) {
+          return res.status(201).json({
+            success: true,
+            data: { ...data[0], formData: data[0].form_data || fullLead.formData }
+          });
+        } else if (error) {
+          console.warn('Supabase dynamic insert notice (falling back):', error.message);
+          const standardPayload = {
+            name,
+            email,
+            phone,
+            company,
+            status,
+            notes,
+            form_data: dynamicFields
+          };
+          const fallbackRes = await supabase.from('leads').insert([standardPayload]).select();
+          if (!fallbackRes.error && fallbackRes.data && fallbackRes.data.length > 0) {
+            return res.status(201).json({
+              success: true,
+              data: { ...fallbackRes.data[0], formData: fallbackRes.data[0].form_data || fullLead.formData }
+            });
+          }
+        }
+      } catch (sbErr) {
+        console.warn('Supabase serverless insert error:', sbErr.message);
+      }
+    }
+
+    serverlessLeadsCache.unshift(fullLead);
+    return res.status(201).json({
+      success: true,
+      data: fullLead
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: err.message || 'Failed to submit inquiry'
+    });
+  }
+});
+
+// DELETE /api/leads/:id
+app.delete(['/api/leads/:id', '/leads/:id'], async (req, res) => {
+  const { id } = req.params;
+  try {
+    if (supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('leads')
+          .delete()
+          .eq('id', id)
+          .select();
+
+        if (!error && data) {
+          return res.status(200).json({ success: true, data: data[0] });
+        }
+      } catch (e) {
+        console.warn('Supabase delete lead error:', e.message);
+      }
+    }
+
+    serverlessLeadsCache = serverlessLeadsCache.filter(l => String(l.id) !== String(id));
+    return res.status(200).json({ success: true, data: { id } });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
 });
 
 // POST Upload Route - Direct to Supabase Storage Bucket ('website-assets')
@@ -225,7 +451,7 @@ app.post(['/api/upload', '/upload'], async (req, res) => {
   }
 });
 
-// POST Auth Login Route - Direct Supabase Auth Verification (No hardcoded credentials)
+// POST Auth Login Route
 app.post(['/api/auth/login', '/auth/login'], async (req, res) => {
   const { email, password } = req.body || {};
 

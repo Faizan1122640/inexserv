@@ -1,7 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import fallbackData from '../data/data.json';
 
 export default function CtaBannerSection({ data }) {
+  const navigate = useNavigate();
   const ctaBanner = data || fallbackData.ctaBanner;
 
   return (
@@ -32,6 +34,7 @@ export default function CtaBannerSection({ data }) {
           <div className="flex items-center sm:justify-end justify-start w-full md:w-auto whitespace-nowrap mt-2 md:mt-0">
             <button 
               type="button"
+              onClick={() => navigate('/contact')}
               className="font-medium text-sm md:text-base bg-[#5c6e82]/80 border border-white/30 text-white hover:bg-[#04A552] hover:border-[#04A552] transition-all duration-300 px-6 py-3 rounded-xl flex gap-2.5 items-center justify-center cursor-pointer shadow-md"
             >
               <span>{ctaBanner.buttonText}</span>

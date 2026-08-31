@@ -29,6 +29,7 @@ export default function AdminDashboard() {
   const cmsSections = [
     { id: 'header', label: 'Header & Mega Menu', title: 'Header & Navigation Editor' },
     { id: 'hero', label: 'Hero & Keywords', title: 'Hero Section Editor' },
+    { id: 'contactUs', label: 'Contact Us & Form Builder', title: 'Contact Us Page & Form Builder' },
     { id: 'servicesSection', label: 'Services Cards', title: 'Services Section Editor' },
     { id: 'solutionsSection', label: 'Solutions', title: 'Solutions Section Editor' },
     { id: 'techStackSection', label: 'Tech Stack Categories', title: 'Tech Stack Editor' },
@@ -55,6 +56,7 @@ export default function AdminDashboard() {
         ...data,
         header: { ...defaultData.header, ...(data.header || {}) },
         hero: { ...defaultData.hero, ...(data.hero || {}) },
+        contactUs: { ...defaultData.contactUs, ...(data.contactUs || {}) },
         servicesSection: { ...defaultData.servicesSection, ...(data.servicesSection || {}) },
         solutionsSection: { ...defaultData.solutionsSection, ...(data.solutionsSection || {}) },
         techStackSection: { ...defaultData.techStackSection, ...(data.techStackSection || {}) },
@@ -103,6 +105,9 @@ export default function AdminDashboard() {
 
   // Restore Default Content
   const handleRestoreDefaults = async () => {
+    if (!window.confirm('Are you sure you want to restore all website content and form fields to original defaults?')) {
+      return;
+    }
     setSaving(true);
     try {
       const restored = JSON.parse(JSON.stringify(defaultData));

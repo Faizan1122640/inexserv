@@ -1,0 +1,3 @@
+ALTER TABLE public.leads
+  ADD COLUMN IF NOT EXISTS category TEXT,
+  ADD COLUMN IF NOT EXISTS sub_category TEXT;

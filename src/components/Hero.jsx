@@ -1,13 +1,23 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import fallbackData from '../data/data.json';
 
 export default function Hero({ data, onOpenContact }) {
+  const navigate = useNavigate();
   const hero = data || fallbackData.hero;
   const [kwIdx, setKwIdx] = useState(0);
   const [kwVisible, setKwVisible] = useState(true);
 
   const partnerLogos = hero.partnerLogos || fallbackData.hero.partnerLogos;
   const marqueeLogos = [...partnerLogos, ...partnerLogos, ...partnerLogos];
+
+  const handleContactClick = () => {
+    if (onOpenContact) {
+      onOpenContact();
+    } else {
+      navigate('/contact');
+    }
+  };
 
   useEffect(() => {
     if (!hero.keywords || hero.keywords.length === 0) return;
@@ -78,14 +88,17 @@ export default function Hero({ data, onOpenContact }) {
           {/* CTA Buttons */}
           <div className="mb-10 ml-1 flex md:flex-row flex-col gap-8 sm:items-center justify-start" style={{ opacity: 1, transform: 'none' }}>
             <button
-              onClick={onOpenContact}
+              onClick={handleContactClick}
               className="cursor-pointer flex items-center justify-center bg-sky-primary text-base md:text-lg py-3 md:py-3.5 px-6 md:px-8 text-white rounded-lg hover:rounded-full transition-all duration-300 font-medium shadow min-w-[150px]"
               type="button"
             >
               {hero.ctaLetstalk || "Let's Talk"}
             </button>
 
-            <button className="flex gap-2.5 hover:cursor-pointer items-center group">
+            <a
+              href="#services"
+              className="flex gap-2.5 hover:cursor-pointer items-center group"
+            >
               <p className="text-sky-primary text-base md:text-lg font-medium group-hover:text-sky-primary transition-colors duration-200">
                 {hero.ctaLearnMore || 'Learn More'}
               </p>
@@ -97,7 +110,7 @@ export default function Hero({ data, onOpenContact }) {
                   d="M2 10a.75.75 0 0 1 .75-.75h12.59l-2.1-1.95a.75.75 0 1 1 1.02-1.1l3.5 3.25a.75.75 0 0 1 0 1.1l-3.5 3.25a.75.75 0 1 1-1.02-1.1l2.1-1.95H2.75A.75.75 0 0 1 2 10Z"
                   clipRule="evenodd" />
               </svg>
-            </button>
+            </a>
           </div>
         </div>
       </div>
